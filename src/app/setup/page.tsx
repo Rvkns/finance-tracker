@@ -49,7 +49,7 @@ export default function SetupPage() {
 
         // 1. Join household using RPC (bypasses RLS)
         const { error: joinError } = await supabase
-            .rpc('join_household', { p_invite_code: inviteCode.toUpperCase() });
+            .rpc('join_household', { p_invite_code: inviteCode.toLowerCase() });
 
         if (joinError) {
             console.error(joinError);
