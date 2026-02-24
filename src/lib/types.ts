@@ -22,10 +22,12 @@ export interface Profile {
     household_id: string | null;
     full_name: string | null;
     email: string;
+    salary: number;
 }
 
 export interface Household {
     id: string;
     invite_code: string;
     name: string;
+    split_mode: 'equal' | 'proportional';
 }

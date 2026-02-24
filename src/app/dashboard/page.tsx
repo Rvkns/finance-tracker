@@ -31,17 +31,26 @@ export default async function DashboardPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('household_id, full_name')
+        .select('household_id, full_name, salary')
         .eq('id', user.id)
         .single();
 
     if (!profile?.household_id) redirect('/setup');
 
-    // Fetch all profiles in this household to determine names
+    // Fetch all profiles in this household to determine names and salaries
     const { data: householdProfiles } = await supabase
         .from('profiles')
-        .select('id, full_name')
+        .select('id, full_name, salary')
         .eq('household_id', profile.household_id);
+
+    // Fetch household preferences
+    const { data: household } = await supabase
+        .from('households')
+        .select('split_mode')
+        .eq('id', profile.household_id)
+        .single();
+
+    const splitMode = household?.split_mode || 'equal';
 
     // Fetch transactions
     const { data: transactions } = await supabase
@@ -67,7 +76,22 @@ export default async function DashboardPage() {
     const partnerName = partnerProfile?.full_name?.split(' ')[0] ?? 'Partner';
 
     // 💸 SPLIT EXPENSES LOGIC
-    const fairShare = monthlyTotal / 2;
+    let fairShare = monthlyTotal / 2;
+    let splitLabelText = 'Bilancio 50/50';
+
+    if (splitMode === 'proportional') {
+        const mySalary = Number(profile.salary) || 0;
+        const partnerSalary = Number(partnerProfile?.salary) || 0;
+        const totalIncome = mySalary + partnerSalary;
+
+        if (totalIncome > 0) {
+            const myWeight = mySalary / totalIncome;
+            fairShare = monthlyTotal * myWeight;
+            splitLabelText = `Bilancio Proporzionale (${Math.round(myWeight * 100)}%)`;
+        } else {
+            splitLabelText = 'Bilancio Proporzionale (Salari: 0€)';
+        }
+    }
     // Positive balance = user paid more than their fair share -> partner owes them
     // Negative balance = user paid less than their fair share -> user owes partner
     const myBalance = myTotal - fairShare;
@@ -131,7 +155,7 @@ export default async function DashboardPage() {
                         {balanceIcon}
                     </div>
                     <div className={styles.splitText}>
-                        <p className={styles.splitLabel}>Bilancio 50/50</p>
+                        <p className={styles.splitLabel}>{splitLabelText}</p>
                         <p className={styles.splitMessage} style={{ color: balanceColor }}>
                             {balanceMessage}
                         </p>
