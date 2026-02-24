@@ -155,6 +155,11 @@ export default function ProfilePage() {
                             <option value="equal">Bilancio 50/50 - A metà esatta</option>
                             <option value="proportional">Proporzionale - Basato sullo stipendio</option>
                         </select>
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            {splitMode === 'equal'
+                                ? "Il totale mensile viene diviso in due parti uguali. Ideale per chi condivide ogni spesa a metà."
+                                : "Il totale viene diviso in percentuale calcolando il peso degli stipendi inseriti. Ideale per un bilancio equo."}
+                        </div>
                     </div>
 
                     <div className={styles.inviteBox}>
