@@ -10,6 +10,8 @@ export const CATEGORIES = [
     { id: 'travel', name: 'Viaggi', icon: '✈️', color: '#0ea5e9' },
     { id: 'subscriptions', name: 'Abbonamenti', icon: '📱', color: '#14b8a6' },
     { id: 'gifts', name: 'Regali', icon: '🎁', color: '#f43f5e' },
+    { id: 'maui_health', name: 'Farmaci Maui', icon: '💊', color: '#d946ef' },
+    { id: 'maui', name: 'Maui', icon: '🐾', color: '#84cc16' },
     { id: 'other', name: 'Altro', icon: '📦', color: '#6b7280' },
 ] as const;
 

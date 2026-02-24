@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { CATEGORIES, getCategoryById } from '@/lib/categories';
+import CategoryBudgets from './CategoryBudgets';
 import type { Transaction } from '@/lib/types';
 import styles from './page.module.css';
 
@@ -32,6 +33,11 @@ export default async function StatisticsPage() {
         .eq('household_id', profile.household_id)
         .gte('date', startOfMonth)
         .lte('date', endOfMonth);
+
+    const { data: budgets } = await supabase
+        .from('budgets')
+        .select('*')
+        .eq('household_id', profile.household_id);
 
     const monthName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
     const total = (transactions ?? []).reduce((s: number, t: Transaction) => s + Number(t.amount), 0);
@@ -80,25 +86,11 @@ export default async function StatisticsPage() {
                 {catData.length === 0 ? (
                     <p className={styles.empty}>Nessuna spesa questo mese.</p>
                 ) : (
-                    <ul className={styles.catList}>
-                        {catData.map(cat => (
-                            <li key={cat.id} className={styles.catItem}>
-                                <div className={styles.catLeft}>
-                                    <span className={styles.catIcon}>{cat.icon}</span>
-                                    <span className={styles.catName}>{cat.name}</span>
-                                </div>
-                                <div className={styles.catRight}>
-                                    <div className={styles.barBg}>
-                                        <div
-                                            className={styles.bar}
-                                            style={{ width: `${cat.pct}%`, background: cat.color }}
-                                        />
-                                    </div>
-                                    <span className={styles.catTotal}>{formatCurrency(cat.total)}</span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    <CategoryBudgets
+                        catData={catData as any}
+                        initialBudgets={budgets ?? []}
+                        householdId={profile.household_id}
+                    />
                 )}
             </section>
         </div>
