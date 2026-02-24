@@ -32,3 +32,20 @@ export interface Household {
     name: string;
     split_mode: 'equal' | 'proportional';
 }
+
+export interface Budget {
+    id: string;
+    household_id: string;
+    category_id: string;
+    amount: number;
+}
+
+export interface RecurringExpense {
+    id: string;
+    household_id: string;
+    category_id: string;
+    name: string;
+    amount: number;
+    created_at?: string;
+    updated_at?: string;
+}

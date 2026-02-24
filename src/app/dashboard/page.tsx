@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { CATEGORIES, getCategoryById } from '@/lib/categories';
-import type { Transaction } from '@/lib/types';
+import type { Transaction, RecurringExpense } from '@/lib/types';
 import DashboardClient from './DashboardClient';
 import styles from './page.module.css';
 
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
 
     const splitMode = household?.split_mode || 'equal';
 
-    // Fetch transactions
+    // Fetch transactions for the current month
     const { data: transactions } = await supabase
         .from('transactions')
         .select('*')
@@ -60,6 +60,22 @@ export default async function DashboardPage() {
         .gte('date', startOfMonth)
         .lte('date', endOfMonth)
         .order('date', { ascending: false });
+
+    // Fetch recurring expense templates
+    const { data: recurringExpenses } = await supabase
+        .from('recurring_expenses')
+        .select('*')
+        .eq('household_id', profile.household_id);
+
+    // Calculate pending recurring expenses
+    // A recurring expense is pending if NO transaction with the exact same name exists in THIS month
+    const pendingRecurring = (recurringExpenses ?? []).filter(recur =>
+        !(transactions ?? []).some(t => t.name === recur.name) // wait, transactions don't have name, they have description? Need to check. In our DB, transaction has 'description'. Let's match on description.
+    );
+    // Actually our previous definition of Transaction used description. Let's make sure it matches 'description'.
+    const finalPendingRecurring = (recurringExpenses ?? []).filter(recur =>
+        !(transactions ?? []).some(t => t.description === recur.name)
+    );
 
     const recentTransactions = (transactions ?? []).slice(0, 20);
 
@@ -166,9 +182,10 @@ export default async function DashboardPage() {
                 </div>
             )}
 
-            {/* Recent Transactions */}
+            {/* Recent Transactions & Pending Fixed Expenses */}
             <DashboardClient
                 initialTransactions={recentTransactions}
+                pendingRecurring={finalPendingRecurring}
                 userId={user.id}
                 userName={userName}
                 partnerName={partnerName}

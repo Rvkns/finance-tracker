@@ -170,6 +170,14 @@ export default function ProfilePage() {
                 </div>
             </div>
 
+            <button
+                onClick={() => router.push('/recurring')}
+                className={styles.btn}
+                style={{ marginBottom: '16px', background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+            >
+                🔄 Gestisci Spese Fisse
+            </button>
+
             <button onClick={handleLogout} className={styles.logoutBtn}>
                 🚪 Disconnetti
             </button>
