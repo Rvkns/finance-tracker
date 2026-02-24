@@ -18,9 +18,18 @@ export default async function StatisticsPage() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('household_id')
+        .eq('id', user.id)
+        .single();
+
+    if (!profile?.household_id) redirect('/setup');
+
     const { data: transactions } = await supabase
         .from('transactions')
         .select('*')
+        .eq('household_id', profile.household_id)
         .gte('date', startOfMonth)
         .lte('date', endOfMonth);
 

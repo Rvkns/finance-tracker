@@ -1,6 +1,7 @@
 export interface Transaction {
     id: string;
     user_id: string;
+    household_id: string;
     amount: number;
     category_id: string;
     description: string | null;
@@ -18,6 +19,13 @@ export interface Category {
 
 export interface Profile {
     id: string;
+    household_id: string | null;
     full_name: string | null;
     email: string;
+}
+
+export interface Household {
+    id: string;
+    invite_code: string;
+    name: string;
 }

@@ -28,20 +28,24 @@ export default async function DashboardPage() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
-    // Fetch all transactions current user has access to (month + recent)
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('household_id, full_name')
+        .eq('id', user.id)
+        .single();
+
+    if (!profile?.household_id) redirect('/setup');
+
+    // Fetch transactions with profile data
     const { data: transactions } = await supabase
         .from('transactions')
-        .select('*, profiles(full_name)')
+        .select('*, profiles(id, full_name)')
+        .eq('household_id', profile.household_id)
         .gte('date', startOfMonth)
         .lte('date', endOfMonth)
-        .order('date', { ascending: false })
-        .limit(100);
+        .order('date', { ascending: false });
 
-    const { data: recentTransactions } = await supabase
-        .from('transactions')
-        .select('*, profiles(full_name)')
-        .order('date', { ascending: false })
-        .limit(20);
+    const recentTransactions = (transactions ?? []).slice(0, 20);
 
     const monthlyTotal = (transactions ?? []).reduce((sum: number, t: Transaction) => sum + Number(t.amount), 0);
     const myTotal = (transactions ?? [])
@@ -49,7 +53,11 @@ export default async function DashboardPage() {
         .reduce((sum: number, t: Transaction) => sum + Number(t.amount), 0);
     const partnerTotal = monthlyTotal - myTotal;
 
-    const userName = user.user_metadata?.full_name?.split(' ')[0] ?? 'Tu';
+    const userName = profile.full_name?.split(' ')[0] ?? 'Tu';
+
+    // Find partner's name from transactions (if any exist)
+    const partnerTx = transactions?.find((t: Transaction) => t.user_id !== user.id);
+    const partnerName = partnerTx?.profiles?.full_name?.split(' ')[0] ?? 'Partner';
     const monthName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
     return (
@@ -80,7 +88,7 @@ export default async function DashboardPage() {
                     <div className={styles.summaryUser}>
                         <span className={styles.userDot} style={{ background: 'var(--success)' }} />
                         <div>
-                            <p className={styles.summaryName}>Partner</p>
+                            <p className={styles.summaryName}>{partnerName}</p>
                             <p className={styles.summaryAmount}>{formatCurrency(partnerTotal)}</p>
                         </div>
                     </div>
@@ -111,7 +119,7 @@ export default async function DashboardPage() {
                                         <div className={styles.transactionMeta}>
                                             <span className={styles.transactionDate}>{formatDate(t.date)}</span>
                                             <span className={`${styles.transactionUser} ${isMe ? styles.me : styles.partner}`}>
-                                                {isMe ? userName : (t.profiles?.full_name?.split(' ')[0] ?? 'Partner')}
+                                                {isMe ? userName : partnerName}
                                             </span>
                                         </div>
                                     </div>

@@ -28,8 +28,21 @@ export default function AddTransactionPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/login'); return; }
 
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('household_id')
+            .eq('id', user.id)
+            .single();
+
+        if (!profile?.household_id) {
+            setError('Nessun gruppo associato. Torna alla home.');
+            setLoading(false);
+            return;
+        }
+
         const { error: dbError } = await supabase.from('transactions').insert({
             user_id: user.id,
+            household_id: profile.household_id,
             amount: parsedAmount,
             category_id: categoryId,
             description: description.trim() || null,

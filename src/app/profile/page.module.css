@@ -109,6 +109,64 @@
     cursor: not-allowed;
 }
 
+.householdSection {
+    margin-bottom: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.householdTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.householdCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.householdName {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+}
+
+.inviteBox {
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.inviteLabel {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.inviteCode {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+    background: var(--accent-glow);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.inviteHint {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
 .logoutBtn {
     width: 100%;
     background: var(--danger-light);

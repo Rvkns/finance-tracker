@@ -17,9 +17,18 @@ export default async function HistoryPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('household_id')
+        .eq('id', user.id)
+        .single();
+
+    if (!profile?.household_id) redirect('/setup');
+
     const { data: transactions } = await supabase
         .from('transactions')
-        .select('*, profiles(full_name)')
+        .select('*, profiles(id, full_name)')
+        .eq('household_id', profile.household_id)
         .order('date', { ascending: false });
 
     const byMonth: Record<string, Transaction[]> = {};
@@ -35,6 +44,10 @@ export default async function HistoryPage() {
     };
 
     const userName = user.user_metadata?.full_name?.split(' ')[0] ?? 'Tu';
+
+    // Find partner's name from transactions (if any exist)
+    const partnerTx = transactions?.find((t: Transaction) => t.user_id !== user.id);
+    const partnerName = partnerTx?.profiles?.full_name?.split(' ')[0] ?? 'Partner';
 
     return (
         <div className={styles.page}>
@@ -71,7 +84,7 @@ export default async function HistoryPage() {
                                                 <div className={styles.meta}>
                                                     <span className={styles.date}>{formatDate(t.date)}</span>
                                                     <span className={`${styles.user} ${isMe ? styles.me : styles.partner}`}>
-                                                        {isMe ? userName : (t.profiles?.full_name?.split(' ')[0] ?? 'Partner')}
+                                                        {isMe ? userName : partnerName}
                                                     </span>
                                                 </div>
                                             </div>

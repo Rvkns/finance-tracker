@@ -12,13 +12,41 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    const [householdCode, setHouseholdCode] = useState('');
+    const [householdName, setHouseholdName] = useState('');
+
     useEffect(() => {
         const supabase = createClient();
-        supabase.auth.getUser().then(({ data: { user } }) => {
+
+        const fetchProfileData = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user) { router.push('/login'); return; }
+
             setEmail(user.email ?? '');
             setName(user.user_metadata?.full_name ?? '');
-        });
+
+            // Fetch household info
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('household_id')
+                .eq('id', user.id)
+                .single();
+
+            if (profile?.household_id) {
+                const { data: hk } = await supabase
+                    .from('households')
+                    .select('name, invite_code')
+                    .eq('id', profile.household_id)
+                    .single();
+
+                if (hk) {
+                    setHouseholdName(hk.name);
+                    setHouseholdCode(hk.invite_code);
+                }
+            }
+        };
+
+        fetchProfileData();
     }, [router]);
 
     const handleUpdate = async (e: React.FormEvent) => {
@@ -66,6 +94,18 @@ export default function ProfilePage() {
                     {loading ? 'Salvataggio...' : 'Salva modifiche'}
                 </button>
             </form>
+
+            <div className={styles.householdSection}>
+                <h2 className={styles.householdTitle}>Il tuo Gruppo</h2>
+                <div className={styles.householdCard}>
+                    <p className={styles.householdName}>{householdName || 'Caricamento...'}</p>
+                    <div className={styles.inviteBox}>
+                        <span className={styles.inviteLabel}>Codice Invito:</span>
+                        <span className={styles.inviteCode}>{householdCode || '...'}</span>
+                    </div>
+                    <p className={styles.inviteHint}>Condividi questo codice con il tuo partner per unire i vostri account.</p>
+                </div>
+            </div>
 
             <button onClick={handleLogout} className={styles.logoutBtn}>
                 🚪 Disconnetti
