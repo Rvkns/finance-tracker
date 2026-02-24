@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import RecurringClient from './RecurringClient';
 import styles from './page.module.css';
@@ -30,6 +31,15 @@ export default async function RecurringPage() {
 
     return (
         <div className={styles.page}>
+            <div className={styles.topNav}>
+                <Link href="/dashboard" className={styles.navLink}>
+                    <span>🏠</span> Home
+                </Link>
+                <Link href="/profile" className={styles.navLink}>
+                    <span>👤</span> Profilo
+                </Link>
+            </div>
+
             <header className={styles.header}>
                 <h1 className={styles.title}>Spese Fisse 🔄</h1>
                 <p className={styles.subtitle}>Gestisci i tuoi abbonamenti e costi ricorrenti</p>

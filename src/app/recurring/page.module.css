@@ -4,6 +4,33 @@
     margin: 0 auto;
 }
 
+.topNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.navLink:hover {
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+    transform: translateY(-1px);
+}
+
 .header {
     margin-bottom: 24px;
 }
