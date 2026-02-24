@@ -120,6 +120,9 @@ export default async function DashboardPage() {
                 <div>
                     <p className={styles.greeting}>Ciao, {userName} 👋</p>
                     <h1 className={styles.month}>{monthName}</h1>
+                    <div className={styles.splitModeBadge}>
+                        ⚖️ Div: {splitMode === 'equal' ? '50/50' : 'Proporzionale'}
+                    </div>
                 </div>
                 <div className={styles.avatar}>
                     {userName.charAt(0).toUpperCase()}
