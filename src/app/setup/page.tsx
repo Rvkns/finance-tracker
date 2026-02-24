@@ -30,7 +30,8 @@ export default function SetupPage() {
             .single();
 
         if (hError || !household) {
-            setError('Errore nella creazione del gruppo.');
+            console.error(hError);
+            setError(`Errore nella creazione del gruppo: ${hError?.message || 'Sconosciuto'}`);
             setLoading(false);
             return;
         }
@@ -42,7 +43,8 @@ export default function SetupPage() {
             .eq('id', user.id);
 
         if (pError) {
-            setError('Errore durante il collegamento al gruppo.');
+            console.error(pError);
+            setError(`Errore durante il collegamento al gruppo: ${pError.message}`);
             setLoading(false);
             return;
         }
@@ -81,7 +83,8 @@ export default function SetupPage() {
             .eq('id', user.id);
 
         if (pError) {
-            setError('Errore durante l\'unione al gruppo.');
+            console.error(pError);
+            setError(`Errore durante l'unione al gruppo: ${pError.message}`);
             setLoading(false);
             return;
         }
