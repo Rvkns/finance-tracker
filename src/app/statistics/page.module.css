@@ -250,3 +250,111 @@
         transform: translateY(0);
     }
 }
+
+/* Time Range Selector */
+.rangeSelector {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 6px;
+    margin-bottom: 24px;
+    gap: 4px;
+}
+
+.rangeBtn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rangeBtnActive {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Rule 50/30/20 Widget */
+.ruleWidget {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.ruleHeader {
+    margin-bottom: 20px;
+}
+
+.ruleTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.ruleSubtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.ruleBars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ruleItem {
+    width: 100%;
+}
+
+.ruleItemHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.ruleItemLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ruleItemAmounts {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.ruleBarBg {
+    height: 8px;
+    background: var(--bg-page);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.ruleBarFill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.5s ease;
+    min-width: 3px;
+}
+
+.ruleWidgetEmpty {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 24px;
+}

@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { CATEGORIES, getCategoryById } from '@/lib/categories';
 import CategoryBudgets from './CategoryBudgets';
+import TimeRangeSelector from './TimeRangeSelector';
+import Rule503020Widget from './Rule503020Widget';
 import type { Transaction } from '@/lib/types';
 import styles from './page.module.css';
 
@@ -9,15 +11,36 @@ function formatCurrency(amount: number) {
     return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
-export default async function StatisticsPage() {
+export default async function StatisticsPage({ searchParams }: { searchParams: { range?: string } }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
+    const range = searchParams.range || 'month';
     const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+    let startDate: string;
+    let endDate: string;
+    let dateLabel: string;
+
+    if (range === 'week') {
+        const firstDay = new Date(now);
+        firstDay.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)); // Start on Monday
+        firstDay.setHours(0, 0, 0, 0);
+        startDate = firstDay.toISOString();
+        const lastDay = new Date(firstDay);
+        lastDay.setDate(firstDay.getDate() + 6);
+        lastDay.setHours(23, 59, 59, 999);
+        endDate = lastDay.toISOString();
+        dateLabel = "Questa settimana";
+    } else if (range === 'year') {
+        startDate = new Date(now.getFullYear(), 0, 1).toISOString();
+        endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59).toISOString();
+        dateLabel = `Anno ${now.getFullYear()}`;
+    } else { // default 'month'
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+        dateLabel = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    }
 
     const { data: profile } = await supabase
         .from('profiles')
@@ -31,24 +54,41 @@ export default async function StatisticsPage() {
         .from('transactions')
         .select('*')
         .eq('household_id', profile.household_id)
-        .gte('date', startOfMonth)
-        .lte('date', endOfMonth);
+        .gte('date', startDate)
+        .lte('date', endDate);
 
     const { data: budgets } = await supabase
         .from('budgets')
         .select('*')
         .eq('household_id', profile.household_id);
 
-    const monthName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    const { data: houseProfiles } = await supabase
+        .from('profiles')
+        .select('salary')
+        .eq('household_id', profile.household_id);
+
+    const totalIncome = (houseProfiles ?? []).reduce((acc, p) => acc + (Number(p.salary) || 0), 0);
+
     const total = (transactions ?? []).reduce((s: number, t: Transaction) => s + Number(t.amount), 0);
     const myTotal = (transactions ?? []).filter((t: Transaction) => t.user_id === user.id)
         .reduce((s: number, t: Transaction) => s + Number(t.amount), 0);
     const partnerTotal = total - myTotal;
 
-    // By category
+    // By category & 50/30/20 calculation
     const byCat: Record<string, number> = {};
+    let needsActual = 0;
+    let wantsActual = 0;
+
     (transactions ?? []).forEach((t: Transaction) => {
-        byCat[t.category_id] = (byCat[t.category_id] ?? 0) + Number(t.amount);
+        const amount = Number(t.amount);
+        byCat[t.category_id] = (byCat[t.category_id] ?? 0) + amount;
+
+        const categoryMeta = getCategoryById(t.category_id);
+        if (categoryMeta.rule === 'needs') {
+            needsActual += amount;
+        } else if (categoryMeta.rule === 'wants') {
+            wantsActual += amount;
+        }
     });
 
     const catData = CATEGORIES.map(cat => ({
@@ -61,8 +101,10 @@ export default async function StatisticsPage() {
         <div className={styles.page}>
             <header className={styles.header}>
                 <h1 className={styles.title}>Statistiche 📊</h1>
-                <p className={styles.subtitle} style={{ textTransform: 'capitalize' }}>{monthName}</p>
+                <p className={styles.subtitle} style={{ textTransform: 'capitalize' }}>{dateLabel}</p>
             </header>
+
+            <TimeRangeSelector />
 
             {/* Overview */}
             <div className={styles.overviewGrid}>
@@ -79,6 +121,12 @@ export default async function StatisticsPage() {
                     <p className={styles.overviewValue} style={{ color: 'var(--success)' }}>{formatCurrency(partnerTotal)}</p>
                 </div>
             </div>
+
+            <Rule503020Widget
+                totalIncome={totalIncome}
+                needsActual={needsActual}
+                wantsActual={wantsActual}
+            />
 
             {/* By Category */}
             <section className={styles.section}>
