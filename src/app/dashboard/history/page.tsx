@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createClient } from '@/lib/supabase/server';
 import HistoryClient from './HistoryClient';
 import type { Transaction } from '@/lib/types';
 import styles from './page.module.css';
