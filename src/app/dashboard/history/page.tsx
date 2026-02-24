@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getCategoryById } from '@/lib/categories';
+import { createClient } from '@/lib/supabase/server';
+import HistoryClient from './HistoryClient';
 import type { Transaction } from '@/lib/types';
 import styles from './page.module.css';
 
@@ -67,41 +68,12 @@ export default async function HistoryPage() {
                     <p>Nessuna spesa ancora.<br />Aggiungi la prima!</p>
                 </div>
             ) : (
-                Object.entries(byMonth).map(([month, txs]) => {
-                    const total = txs.reduce((s, t) => s + Number(t.amount), 0);
-                    return (
-                        <section key={month} className={styles.monthSection}>
-                            <div className={styles.monthHeader}>
-                                <h2 className={styles.monthLabel}>{monthLabel(month)}</h2>
-                                <span className={styles.monthTotal}>{formatCurrency(total)}</span>
-                            </div>
-                            <ul className={styles.list}>
-                                {txs.map((t: Transaction) => {
-                                    const cat = getCategoryById(t.category_id);
-                                    const isMe = t.user_id === user.id;
-                                    return (
-                                        <li key={t.id} className={styles.item}>
-                                            <div className={styles.catIcon} style={{ background: cat.color + '22', color: cat.color }}>
-                                                {cat.icon}
-                                            </div>
-                                            <div className={styles.info}>
-                                                <p className={styles.catName}>{cat.name}</p>
-                                                {t.description && <p className={styles.desc}>{t.description}</p>}
-                                                <div className={styles.meta}>
-                                                    <span className={styles.date}>{formatDate(t.date)}</span>
-                                                    <span className={`${styles.user} ${isMe ? styles.me : styles.partner}`}>
-                                                        {isMe ? userName : partnerName}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <p className={styles.amount}>-{formatCurrency(Number(t.amount))}</p>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </section>
-                    );
-                })
+                <HistoryClient
+                    transactions={transactions ?? []}
+                    userId={user.id}
+                    userName={userName}
+                    partnerName={partnerName}
+                />
             )}
         </div>
     );

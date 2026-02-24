@@ -139,3 +139,34 @@
     color: var(--text-primary);
     flex-shrink: 0;
 }
+
+/* Deletion UI */
+.itemContent {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    font-size: 18px;
+    padding: 8px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+.deleteBtn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.itemDeleting {
+    opacity: 0.5;
+    pointer-events: none;
+}

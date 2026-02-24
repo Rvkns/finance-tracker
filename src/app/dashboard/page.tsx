@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getCategoryById } from '@/lib/categories';
+import { CATEGORIES, getCategoryById } from '@/lib/categories';
 import type { Transaction } from '@/lib/types';
+import DashboardClient from './DashboardClient';
 import styles from './page.module.css';
 
 function formatCurrency(amount: number) {
@@ -139,40 +140,12 @@ export default async function DashboardPage() {
             )}
 
             {/* Recent Transactions */}
-            <section className={styles.section}>
-                <h2 className={styles.sectionTitle}>Ultime spese</h2>
-                {!recentTransactions || recentTransactions.length === 0 ? (
-                    <div className={styles.empty}>
-                        <span>💸</span>
-                        <p>Nessuna spesa registrata.<br />Premi <strong>+</strong> per aggiungerne una!</p>
-                    </div>
-                ) : (
-                    <ul className={styles.transactionList}>
-                        {recentTransactions.map((t: Transaction) => {
-                            const cat = getCategoryById(t.category_id);
-                            const isMe = t.user_id === user.id;
-                            return (
-                                <li key={t.id} className={styles.transactionItem + ' animate-fade'}>
-                                    <div className={styles.catIcon} style={{ background: cat.color + '22', color: cat.color }}>
-                                        {cat.icon}
-                                    </div>
-                                    <div className={styles.transactionInfo}>
-                                        <p className={styles.transactionCat}>{cat.name}</p>
-                                        {t.description && <p className={styles.transactionDesc}>{t.description}</p>}
-                                        <div className={styles.transactionMeta}>
-                                            <span className={styles.transactionDate}>{formatDate(t.date)}</span>
-                                            <span className={`${styles.transactionUser} ${isMe ? styles.me : styles.partner}`}>
-                                                {isMe ? userName : partnerName}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <p className={styles.transactionAmount}>-{formatCurrency(Number(t.amount))}</p>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                )}
-            </section>
+            <DashboardClient
+                initialTransactions={recentTransactions}
+                userId={user.id}
+                userName={userName}
+                partnerName={partnerName}
+            />
         </div>
     );
 }
