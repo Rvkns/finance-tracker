@@ -58,6 +58,28 @@ export default async function DashboardPage() {
     // Find partner's name from transactions (if any exist)
     const partnerTx = transactions?.find((t: Transaction) => t.user_id !== user.id);
     const partnerName = partnerTx?.profiles?.full_name?.split(' ')[0] ?? 'Partner';
+
+    // 💸 SPLIT EXPENSES LOGIC
+    const fairShare = monthlyTotal / 2;
+    // Positive balance = user paid more than their fair share -> partner owes them
+    // Negative balance = user paid less than their fair share -> user owes partner
+    const myBalance = myTotal - fairShare;
+    let balanceMessage = 'Siete in pari!';
+    let balanceColor = 'var(--text-secondary)';
+    let balanceIcon = '🤝';
+
+    if (myBalance > 0.01) {
+        // Partner owes me
+        balanceMessage = `${partnerName} ti deve ${formatCurrency(myBalance)}`;
+        balanceColor = 'var(--success)';
+        balanceIcon = '⬆️';
+    } else if (myBalance < -0.01) {
+        // I owe partner
+        balanceMessage = `Devi ${formatCurrency(Math.abs(myBalance))} a ${partnerName}`;
+        balanceColor = 'var(--danger)';
+        balanceIcon = '⬇️';
+    }
+
     const monthName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
     return (
@@ -94,6 +116,21 @@ export default async function DashboardPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Fair Share / Split Expenses Widget */}
+            {monthlyTotal > 0 && (
+                <div className={styles.splitWidget} style={{ borderColor: balanceColor }}>
+                    <div className={styles.splitIcon} style={{ background: `${balanceColor}22`, color: balanceColor }}>
+                        {balanceIcon}
+                    </div>
+                    <div className={styles.splitText}>
+                        <p className={styles.splitLabel}>Bilancio 50/50</p>
+                        <p className={styles.splitMessage} style={{ color: balanceColor }}>
+                            {balanceMessage}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Recent Transactions */}
             <section className={styles.section}>
