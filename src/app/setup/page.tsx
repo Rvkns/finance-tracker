@@ -22,29 +22,13 @@ export default function SetupPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // 1. Create household
-        const { data: household, error: hError } = await supabase
-            .from('households')
-            .insert({ name: householdName || 'Casa' })
-            .select('id')
-            .single();
+        // 1. Create household and assign user (Atomic RPC)
+        const { error: hError } = await supabase
+            .rpc('create_household', { household_name: householdName || 'Casa' });
 
-        if (hError || !household) {
+        if (hError) {
             console.error(hError);
-            setError(`Errore nella creazione del gruppo: ${hError?.message || 'Sconosciuto'}`);
-            setLoading(false);
-            return;
-        }
-
-        // 2. Assign user to household
-        const { error: pError } = await supabase
-            .from('profiles')
-            .update({ household_id: household.id })
-            .eq('id', user.id);
-
-        if (pError) {
-            console.error(pError);
-            setError(`Errore durante il collegamento al gruppo: ${pError.message}`);
+            setError(`Errore nella creazione del gruppo: ${hError.message}`);
             setLoading(false);
             return;
         }
