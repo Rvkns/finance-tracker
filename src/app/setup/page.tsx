@@ -47,28 +47,13 @@ export default function SetupPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // 1. Find household by code
-        const { data: household } = await supabase
-            .from('households')
-            .select('id')
-            .eq('invite_code', inviteCode.toUpperCase())
-            .single();
+        // 1. Join household using RPC (bypasses RLS)
+        const { error: joinError } = await supabase
+            .rpc('join_household', { p_invite_code: inviteCode.toUpperCase() });
 
-        if (!household) {
+        if (joinError) {
+            console.error(joinError);
             setError('Codice non valido o gruppo inesistente.');
-            setLoading(false);
-            return;
-        }
-
-        // 2. Assign user
-        const { error: pError } = await supabase
-            .from('profiles')
-            .update({ household_id: household.id })
-            .eq('id', user.id);
-
-        if (pError) {
-            console.error(pError);
-            setError(`Errore durante l'unione al gruppo: ${pError.message}`);
             setLoading(false);
             return;
         }
