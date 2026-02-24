@@ -1,0 +1,13 @@
+.shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    background: var(--bg-primary);
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom));
+    padding-top: env(safe-area-inset-top);
+}
