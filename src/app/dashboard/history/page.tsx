@@ -25,9 +25,15 @@ export default async function HistoryPage() {
 
     if (!profile?.household_id) redirect('/setup');
 
+    // Fetch all profiles in this household to determine names
+    const { data: householdProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('household_id', profile.household_id);
+
     const { data: transactions } = await supabase
         .from('transactions')
-        .select('*, profiles(id, full_name)')
+        .select('*')
         .eq('household_id', profile.household_id)
         .order('date', { ascending: false });
 
@@ -45,9 +51,9 @@ export default async function HistoryPage() {
 
     const userName = user.user_metadata?.full_name?.split(' ')[0] ?? 'Tu';
 
-    // Find partner's name from transactions (if any exist)
-    const partnerTx = transactions?.find((t: Transaction) => t.user_id !== user.id);
-    const partnerName = partnerTx?.profiles?.full_name?.split(' ')[0] ?? 'Partner';
+    // Find partner's name from household profiles (the one that isn't the current user)
+    const partnerProfile = householdProfiles?.find(p => p.id !== user.id);
+    const partnerName = partnerProfile?.full_name?.split(' ')[0] ?? 'Partner';
 
     return (
         <div className={styles.page}>

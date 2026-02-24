@@ -36,10 +36,16 @@ export default async function DashboardPage() {
 
     if (!profile?.household_id) redirect('/setup');
 
-    // Fetch transactions with profile data
+    // Fetch all profiles in this household to determine names
+    const { data: householdProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .eq('household_id', profile.household_id);
+
+    // Fetch transactions
     const { data: transactions } = await supabase
         .from('transactions')
-        .select('*, profiles(id, full_name)')
+        .select('*')
         .eq('household_id', profile.household_id)
         .gte('date', startOfMonth)
         .lte('date', endOfMonth)
@@ -55,9 +61,9 @@ export default async function DashboardPage() {
 
     const userName = profile.full_name?.split(' ')[0] ?? 'Tu';
 
-    // Find partner's name from transactions (if any exist)
-    const partnerTx = transactions?.find((t: Transaction) => t.user_id !== user.id);
-    const partnerName = partnerTx?.profiles?.full_name?.split(' ')[0] ?? 'Partner';
+    // Find partner's name from household profiles (the one that isn't the current user)
+    const partnerProfile = householdProfiles?.find(p => p.id !== user.id);
+    const partnerName = partnerProfile?.full_name?.split(' ')[0] ?? 'Partner';
 
     // 💸 SPLIT EXPENSES LOGIC
     const fairShare = monthlyTotal / 2;
