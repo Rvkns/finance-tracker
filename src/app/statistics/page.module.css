@@ -281,35 +281,40 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Rule 50/30/20 Widget Tabs */
-.ruleTabs {
+/* Rule 50/30/20 stacked sections */
+.ruleSection {
+    padding: 4px 0;
+}
+
+.ruleSectionHeader {
     display: flex;
-    background: var(--bg-page);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 4px;
-    gap: 4px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
 }
 
-.ruleTab {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 8px 0;
+.ruleSectionTitle {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.ruleSectionIncome {
     font-size: 12px;
-    font-weight: 600;
     color: var(--text-secondary);
-    border-radius: calc(var(--radius) - 2px);
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.3px;
+    font-weight: 500;
 }
 
-.ruleTabActive {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.ruleSectionEmpty {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 4px 0 8px;
+}
+
+.ruleDivider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
 }
 
 /* Rule 50/30/20 Widget */
