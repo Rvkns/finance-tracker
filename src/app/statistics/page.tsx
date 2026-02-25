@@ -64,30 +64,43 @@ export default async function StatisticsPage({ searchParams }: { searchParams: {
 
     const { data: houseProfiles } = await supabase
         .from('profiles')
-        .select('salary')
+        .select('id, full_name, salary')
         .eq('household_id', profile.household_id);
 
     const totalIncome = (houseProfiles ?? []).reduce((acc, p) => acc + (Number(p.salary) || 0), 0);
+
+    const myProfile = (houseProfiles ?? []).find(p => p.id === user.id);
+    const partnerProfile = (houseProfiles ?? []).find(p => p.id !== user.id);
+    const myIncome = Number(myProfile?.salary) || 0;
+    const partnerIncome = Number(partnerProfile?.salary) || 0;
 
     const total = (transactions ?? []).reduce((s: number, t: Transaction) => s + Number(t.amount), 0);
     const myTotal = (transactions ?? []).filter((t: Transaction) => t.user_id === user.id)
         .reduce((s: number, t: Transaction) => s + Number(t.amount), 0);
     const partnerTotal = total - myTotal;
 
-    // By category & 50/30/20 calculation
+    // By category & 50/30/20 calculation (total + per-user)
     const byCat: Record<string, number> = {};
     let needsActual = 0;
     let wantsActual = 0;
+    let myNeedsActual = 0;
+    let myWantsActual = 0;
+    let partnerNeedsActual = 0;
+    let partnerWantsActual = 0;
 
     (transactions ?? []).forEach((t: Transaction) => {
         const amount = Number(t.amount);
         byCat[t.category_id] = (byCat[t.category_id] ?? 0) + amount;
 
         const categoryMeta = getCategoryById(t.category_id);
+        const isMe = t.user_id === user.id;
+
         if (categoryMeta.rule === 'needs') {
             needsActual += amount;
+            if (isMe) myNeedsActual += amount; else partnerNeedsActual += amount;
         } else if (categoryMeta.rule === 'wants') {
             wantsActual += amount;
+            if (isMe) myWantsActual += amount; else partnerWantsActual += amount;
         }
     });
 
@@ -126,6 +139,12 @@ export default async function StatisticsPage({ searchParams }: { searchParams: {
                 totalIncome={totalIncome}
                 needsActual={needsActual}
                 wantsActual={wantsActual}
+                myIncome={myIncome}
+                myNeedsActual={myNeedsActual}
+                myWantsActual={myWantsActual}
+                partnerIncome={partnerIncome}
+                partnerNeedsActual={partnerNeedsActual}
+                partnerWantsActual={partnerWantsActual}
             />
 
             {/* By Category */}
