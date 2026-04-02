@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { getCategoryById } from '@/lib/categories';
 import type { Transaction, RecurringExpense } from '@/lib/types';
@@ -151,45 +152,52 @@ export default function DashboardClient({
                         <p>Nessuna spesa registrata.<br />Premi <strong>+</strong> per aggiungerne una!</p>
                     </div>
                 ) : (
-                    <ul className={styles.transactionList}>
-                        {transactions.map((t: Transaction) => {
-                            const cat = getCategoryById(t.category_id);
-                            const isMe = t.user_id === userId;
-                            const isDeleting = deletingId === t.id;
+                    <>
+                        <ul className={styles.transactionList}>
+                            {transactions.map((t: Transaction) => {
+                                const cat = getCategoryById(t.category_id);
+                                const isMe = t.user_id === userId;
+                                const isDeleting = deletingId === t.id;
 
-                            return (
-                                <li key={t.id} className={`${styles.transactionItem} ${isDeleting ? styles.itemDeleting : ''} animate-fade`}>
-                                    <div className={styles.itemContent}>
-                                        <div className={styles.catIcon} style={{ background: cat.color + '22', color: cat.color }}>
-                                            {cat.icon}
-                                        </div>
-                                        <div className={styles.transactionInfo}>
-                                            <p className={styles.transactionCat}>{cat.name}</p>
-                                            {t.description && <p className={styles.transactionDesc}>{t.description}</p>}
-                                            <div className={styles.transactionMeta}>
-                                                <span className={styles.transactionDate}>{formatDate(t.date)}</span>
-                                                <span className={`${styles.transactionUser} ${isMe ? styles.me : styles.partner}`}>
-                                                    {isMe ? userName : partnerName}
-                                                </span>
+                                return (
+                                    <li key={t.id} className={`${styles.transactionItem} ${isDeleting ? styles.itemDeleting : ''} animate-fade`}>
+                                        <div className={styles.itemContent}>
+                                            <div className={styles.catIcon} style={{ background: cat.color + '22', color: cat.color }}>
+                                                {cat.icon}
                                             </div>
+                                            <div className={styles.transactionInfo}>
+                                                <p className={styles.transactionCat}>{cat.name}</p>
+                                                {t.description && <p className={styles.transactionDesc}>{t.description}</p>}
+                                                <div className={styles.transactionMeta}>
+                                                    <span className={styles.transactionDate}>{formatDate(t.date)}</span>
+                                                    <span className={`${styles.transactionUser} ${isMe ? styles.me : styles.partner}`}>
+                                                        {isMe ? userName : partnerName}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p className={styles.transactionAmount}>-{formatCurrency(Number(t.amount))}</p>
                                         </div>
-                                        <p className={styles.transactionAmount}>-{formatCurrency(Number(t.amount))}</p>
-                                    </div>
 
-                                    {isMe && (
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={() => handleDelete(t.id)}
-                                            disabled={isDeleting}
-                                            aria-label="Elimina spesa"
-                                        >
-                                            🗑️
-                                        </button>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
+                                        {isMe && (
+                                            <button
+                                                className={styles.deleteBtn}
+                                                onClick={() => handleDelete(t.id)}
+                                                disabled={isDeleting}
+                                                aria-label="Elimina spesa"
+                                            >
+                                                🗑️
+                                            </button>
+                                        )}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                            <Link href="/dashboard/history" style={{ fontSize: '13px', color: 'var(--accent-light)', textDecoration: 'none', fontWeight: 600 }}>
+                                Vedi storico completo →
+                            </Link>
+                        </div>
+                    </>
                 )}
             </section>
         </div>

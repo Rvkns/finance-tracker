@@ -61,6 +61,12 @@ export default async function DashboardPage() {
         .lte('date', endOfMonth)
         .order('date', { ascending: false });
 
+    // Fetch ALL historical transactions for cumulative balance
+    const { data: allTransactions } = await supabase
+        .from('transactions')
+        .select('user_id, amount')
+        .eq('household_id', profile.household_id);
+
     // Fetch recurring expense templates
     const { data: recurringExpenses } = await supabase
         .from('recurring_expenses')
@@ -91,40 +97,67 @@ export default async function DashboardPage() {
     const partnerProfile = householdProfiles?.find(p => p.id !== user.id);
     const partnerName = partnerProfile?.full_name?.split(' ')[0] ?? 'Partner';
 
-    // 💸 SPLIT EXPENSES LOGIC
+    // 💸 SPLIT EXPENSES LOGIC - current month
     let fairShare = monthlyTotal / 2;
     let splitLabelText = 'Bilancio 50/50';
+    const mySalary = Number(profile.salary) || 0;
+    const partnerSalary = Number(partnerProfile?.salary) || 0;
+    const totalIncome = mySalary + partnerSalary;
+    let myWeight = 0.5;
 
-    if (splitMode === 'proportional') {
-        const mySalary = Number(profile.salary) || 0;
-        const partnerSalary = Number(partnerProfile?.salary) || 0;
-        const totalIncome = mySalary + partnerSalary;
-
-        if (totalIncome > 0) {
-            const myWeight = mySalary / totalIncome;
-            fairShare = monthlyTotal * myWeight;
-            splitLabelText = `Bilancio Proporzionale (${Math.round(myWeight * 100)}%)`;
-        } else {
-            splitLabelText = 'Bilancio Proporzionale (Salari: 0€)';
-        }
+    if (splitMode === 'proportional' && totalIncome > 0) {
+        myWeight = mySalary / totalIncome;
+        fairShare = monthlyTotal * myWeight;
+        splitLabelText = `Bilancio Proporzionale (${Math.round(myWeight * 100)}%)`;
+    } else if (splitMode === 'proportional') {
+        splitLabelText = 'Bilancio Proporzionale (Salari: 0€)';
     }
+
     // Positive balance = user paid more than their fair share -> partner owes them
     // Negative balance = user paid less than their fair share -> user owes partner
     const myBalance = myTotal - fairShare;
-    let balanceMessage = 'Siete in pari!';
+    let balanceMessage = 'Siete in pari questo mese!';
     let balanceColor = 'var(--text-secondary)';
     let balanceIcon = '🤝';
 
     if (myBalance > 0.01) {
-        // Partner owes me
-        balanceMessage = `${partnerName} ti deve ${formatCurrency(myBalance)}`;
+        balanceMessage = `${partnerName} ti deve ${formatCurrency(myBalance)} questo mese`;
         balanceColor = 'var(--success)';
         balanceIcon = '⬆️';
     } else if (myBalance < -0.01) {
-        // I owe partner
-        balanceMessage = `Devi ${formatCurrency(Math.abs(myBalance))} a ${partnerName}`;
+        balanceMessage = `Devi ${formatCurrency(Math.abs(myBalance))} a ${partnerName} questo mese`;
         balanceColor = 'var(--danger)';
         balanceIcon = '⬇️';
+    }
+
+    // 📊 CUMULATIVE ALL-TIME BALANCE
+    const allMyTotal = (allTransactions ?? [])
+        .filter(t => t.user_id === user.id)
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+    const allPartnerTotal = (allTransactions ?? [])
+        .filter(t => t.user_id !== user.id)
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+    const allTotal = allMyTotal + allPartnerTotal;
+
+    let allFairShare: number;
+    if (splitMode === 'proportional' && totalIncome > 0) {
+        allFairShare = allTotal * myWeight;
+    } else {
+        allFairShare = allTotal / 2;
+    }
+    const cumulativeBalance = allMyTotal - allFairShare; // + means partner owes me, - means I owe partner
+    let cumulativeMessage = 'Siete in pari!';
+    let cumulativeColor = 'var(--text-secondary)';
+    let cumulativeIcon = '🤝';
+
+    if (cumulativeBalance > 0.01) {
+        cumulativeMessage = `${partnerName} ti deve ${formatCurrency(cumulativeBalance)}`;
+        cumulativeColor = 'var(--success)';
+        cumulativeIcon = '💚';
+    } else if (cumulativeBalance < -0.01) {
+        cumulativeMessage = `Devi ${formatCurrency(Math.abs(cumulativeBalance))} a ${partnerName}`;
+        cumulativeColor = 'var(--danger)';
+        cumulativeIcon = '🔴';
     }
 
     const monthName = now.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
@@ -167,7 +200,31 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            {/* Fair Share / Split Expenses Widget */}
+            {/* Cumulative All-Time Balance Widget */}
+            <div className={styles.cumulativeWidget} style={{ borderColor: cumulativeColor }}>
+                <div className={styles.cumulativeHeader}>
+                    <span className={styles.cumulativeIcon}>{cumulativeIcon}</span>
+                    <div>
+                        <p className={styles.cumulativeLabel}>Saldo Cumulativo (storico completo)</p>
+                        <p className={styles.cumulativeMessage} style={{ color: cumulativeColor }}>
+                            {cumulativeMessage}
+                        </p>
+                    </div>
+                </div>
+                <div className={styles.cumulativeBreakdown}>
+                    <div className={styles.cumulativeStat}>
+                        <span className={styles.cumulativeStatLabel}>{userName} (tot.)</span>
+                        <span className={styles.cumulativeStatValue} style={{ color: 'var(--accent-light)' }}>{formatCurrency(allMyTotal)}</span>
+                    </div>
+                    <div className={styles.cumulativeDivider} />
+                    <div className={styles.cumulativeStat}>
+                        <span className={styles.cumulativeStatLabel}>{partnerName} (tot.)</span>
+                        <span className={styles.cumulativeStatValue} style={{ color: 'var(--success)' }}>{formatCurrency(allPartnerTotal)}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Monthly Split Widget */}
             {monthlyTotal > 0 && (
                 <div className={styles.splitWidget} style={{ borderColor: balanceColor }}>
                     <div className={styles.splitIcon} style={{ background: `${balanceColor}22`, color: balanceColor }}>

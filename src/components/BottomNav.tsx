@@ -8,7 +8,7 @@ const navItems = [
     { href: '/dashboard', label: 'Home', icon: '🏠' },
     { href: '/statistics', label: 'Statistiche', icon: '📊' },
     { href: '/dashboard/add', label: '', icon: '+', isAdd: true },
-    { href: '/dashboard/history', label: 'Storico', icon: '📋' },
+    { href: '/bilancio', label: 'Bilancio', icon: '⚖️' },
     { href: '/profile', label: 'Profilo', icon: '👤' },
 ];
 

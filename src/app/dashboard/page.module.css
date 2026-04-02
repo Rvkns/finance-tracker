@@ -131,6 +131,81 @@
     color: white;
 }
 
+/* Cumulative Balance Widget */
+.cumulativeWidget {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: border-color 0.3s;
+}
+
+.cumulativeHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cumulativeIcon {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.cumulativeLabel {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 3px;
+}
+
+.cumulativeMessage {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.cumulativeBreakdown {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.cumulativeStat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 12px;
+}
+
+.cumulativeStatLabel {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.cumulativeStatValue {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.cumulativeDivider {
+    width: 1px;
+    height: 40px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
 /* Split Widget */
 .splitWidget {
     display: flex;
