@@ -97,9 +97,7 @@ export default async function DashboardPage() {
     const partnerProfile = householdProfiles?.find(p => p.id !== user.id);
     const partnerName = partnerProfile?.full_name?.split(' ')[0] ?? 'Partner';
 
-    // 💸 SPLIT EXPENSES LOGIC - current month
-    let fairShare = monthlyTotal / 2;
-    let splitLabelText = 'Bilancio 50/50';
+    // 💸 SALARY LOGIC
     const mySalary = Number(profile.salary) || 0;
     const partnerSalary = Number(partnerProfile?.salary) || 0;
     const totalIncome = mySalary + partnerSalary;
@@ -107,27 +105,6 @@ export default async function DashboardPage() {
 
     if (splitMode === 'proportional' && totalIncome > 0) {
         myWeight = mySalary / totalIncome;
-        fairShare = monthlyTotal * myWeight;
-        splitLabelText = `Bilancio Proporzionale (${Math.round(myWeight * 100)}%)`;
-    } else if (splitMode === 'proportional') {
-        splitLabelText = 'Bilancio Proporzionale (Salari: 0€)';
-    }
-
-    // Positive balance = user paid more than their fair share -> partner owes them
-    // Negative balance = user paid less than their fair share -> user owes partner
-    const myBalance = myTotal - fairShare;
-    let balanceMessage = 'Siete in pari questo mese!';
-    let balanceColor = 'var(--text-secondary)';
-    let balanceIcon = '🤝';
-
-    if (myBalance > 0.01) {
-        balanceMessage = `${partnerName} ti deve ${formatCurrency(myBalance)} questo mese`;
-        balanceColor = 'var(--success)';
-        balanceIcon = '⬆️';
-    } else if (myBalance < -0.01) {
-        balanceMessage = `Devi ${formatCurrency(Math.abs(myBalance))} a ${partnerName} questo mese`;
-        balanceColor = 'var(--danger)';
-        balanceIcon = '⬇️';
     }
 
     // 📊 CUMULATIVE ALL-TIME BALANCE
@@ -224,20 +201,7 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            {/* Monthly Split Widget */}
-            {monthlyTotal > 0 && (
-                <div className={styles.splitWidget} style={{ borderColor: balanceColor }}>
-                    <div className={styles.splitIcon} style={{ background: `${balanceColor}22`, color: balanceColor }}>
-                        {balanceIcon}
-                    </div>
-                    <div className={styles.splitText}>
-                        <p className={styles.splitLabel}>{splitLabelText}</p>
-                        <p className={styles.splitMessage} style={{ color: balanceColor }}>
-                            {balanceMessage}
-                        </p>
-                    </div>
-                </div>
-            )}
+
 
             {/* Recent Transactions & Pending Fixed Expenses */}
             <DashboardClient
