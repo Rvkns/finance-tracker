@@ -394,3 +394,31 @@
     font-size: 14px;
     margin-bottom: 24px;
 }
+
+/* Structural Expenses */
+.structuralGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.structuralCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.structuralName {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.structuralAmount {
+    font-size: 16px;
+    font-weight: 800;
+}

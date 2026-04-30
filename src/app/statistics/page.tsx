@@ -57,6 +57,11 @@ export default async function StatisticsPage({ searchParams }: { searchParams: {
         .gte('date', startDate)
         .lte('date', endDate);
 
+    const { data: structuralExpenses } = await supabase
+        .from('structural_expenses')
+        .select('*')
+        .eq('household_id', profile.household_id);
+
     const { data: budgets } = await supabase
         .from('budgets')
         .select('*')
@@ -158,6 +163,27 @@ export default async function StatisticsPage({ searchParams }: { searchParams: {
                         initialBudgets={budgets ?? []}
                         householdId={profile.household_id}
                     />
+                )}
+            </section>
+
+            {/* Structural Expenses */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Spese Strutturali Mensili</h2>
+                {(!structuralExpenses || structuralExpenses.length === 0) ? (
+                    <p className={styles.empty}>Nessuna spesa strutturale.</p>
+                ) : (
+                    <div className={styles.structuralGrid}>
+                        {structuralExpenses.map(expense => (
+                            <div key={expense.id} className={styles.structuralCard}>
+                                <p className={styles.structuralName}>{expense.name}</p>
+                                <p className={styles.structuralAmount}>{formatCurrency(Number(expense.amount))}</p>
+                            </div>
+                        ))}
+                        <div className={styles.structuralCard} style={{ background: 'var(--accent)', color: 'white' }}>
+                            <p className={styles.structuralName} style={{ color: 'rgba(255, 255, 255, 0.8)' }}>Totale Strutturale Mensile</p>
+                            <p className={styles.structuralAmount}>{formatCurrency(structuralExpenses.reduce((s, e) => s + Number(e.amount), 0))}</p>
+                        </div>
+                    </div>
                 )}
             </section>
         </div>
