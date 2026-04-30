@@ -49,3 +49,13 @@ export interface RecurringExpense {
     created_at?: string;
     updated_at?: string;
 }
+
+export interface StructuralExpense {
+    id: string;
+    household_id: string;
+    name: string;
+    amount: number;
+    paid_by: string | null; // null = conto cointestato (split 50/50), altrimenti user_id di chi paga tutto
+    created_at?: string;
+    updated_at?: string;
+}

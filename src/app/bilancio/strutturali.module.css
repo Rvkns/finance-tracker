@@ -1,0 +1,359 @@
+/* ── Container ───────────────────────────────────────────────────── */
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── Calcolatore compensazione ────────────────────────────────────── */
+.calcCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.calcTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    letter-spacing: 0.2px;
+}
+
+.calcTotal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 4px 0;
+}
+
+.calcTotal strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.calcDivider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0;
+}
+
+.calcRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.calcPerson {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid;
+    border-radius: var(--radius);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.calcPersonName {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.calcNote {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.calcNote strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.calcTotal2 {
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+    margin-top: 2px;
+}
+
+.calcTotal2 strong {
+    color: var(--text-primary);
+    font-weight: 800;
+}
+
+/* ── List header ─────────────────────────────────────────────────── */
+.listHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.listTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.addBtn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+.addBtn:hover {
+    opacity: 0.88;
+    transform: scale(1.03);
+}
+
+/* ── Form ────────────────────────────────────────────────────────── */
+.form {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 10px 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: var(--accent);
+}
+
+.radioGroup {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.radioLabel input[type="radio"] {
+    display: none;
+}
+
+.radioActive {
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb, 99, 102, 241), 0.15);
+    color: var(--accent-light);
+}
+
+.saveBtn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.saveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Expense list ─────────────────────────────────────────────────── */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.expenseCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.15s;
+}
+
+.expenseCard:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.expenseLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.expenseName {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.expenseBadge {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.expenseRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.expenseAmount {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    border-radius: var(--radius);
+    transition: background 0.15s;
+}
+
+.expenseAmount:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.editHint {
+    font-size: 11px;
+    opacity: 0.5;
+}
+
+/* Inline edit */
+.editRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.editInput {
+    width: 80px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 8px;
+    outline: none;
+}
+
+.editSave {
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.editCancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    border: none;
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity 0.15s;
+    padding: 4px;
+    border-radius: var(--radius);
+}
+
+.deleteBtn:hover {
+    opacity: 1;
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.empty span {
+    font-size: 36px;
+}
+
+/* ── Disclaimer ──────────────────────────────────────────────────── */
+.disclaimer {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+    padding-bottom: 8px;
+    opacity: 0.7;
+}

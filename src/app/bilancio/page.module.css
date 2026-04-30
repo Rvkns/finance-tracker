@@ -20,6 +20,41 @@
     color: var(--text-secondary);
 }
 
+/* ── Tabs ─────────────────────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 24px;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.tabActive {
+    background: var(--accent);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
 /* Hero Card */
 .heroCard {
     background: var(--bg-card);
