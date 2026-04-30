@@ -20,12 +20,13 @@ function monthLabel(key: string) {
     return d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 }
 
-export default async function BilancioPage({ searchParams }: { searchParams: { tab?: string } }) {
+export default async function BilancioPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+    const params = await searchParams;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
-    const activeTab = searchParams.tab === 'strutturali' ? 'strutturali' : 'storico';
+    const activeTab = params.tab === 'strutturali' ? 'strutturali' : 'storico';
 
     const { data: profile } = await supabase
         .from('profiles')
@@ -163,7 +164,9 @@ export default async function BilancioPage({ searchParams }: { searchParams: { t
                                 <span className={styles.heroStatLabel}>Divisione</span>
                                 <span className={styles.heroStatValue}>
                                     {splitMode === 'proportional'
-                                        ? `${Math.round(myWeight * 100)}/${Math.round((1 - myWeight) * 100)}`
+                                        ? totalIncome > 0 
+                                            ? `Proporzionale (${Math.round(myWeight * 100)}/${Math.round((1 - myWeight) * 100)})` 
+                                            : 'Proporzionale (Salari: 0€)'
                                         : '50/50'}
                                 </span>
                             </div>

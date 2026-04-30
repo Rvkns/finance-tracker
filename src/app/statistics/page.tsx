@@ -11,12 +11,13 @@ function formatCurrency(amount: number) {
     return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
-export default async function StatisticsPage({ searchParams }: { searchParams: { range?: string } }) {
+export default async function StatisticsPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
+    const params = await searchParams;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
-    const range = searchParams.range || 'month';
+    const range = params.range || 'month';
     const now = new Date();
     let startDate: string;
     let endDate: string;
