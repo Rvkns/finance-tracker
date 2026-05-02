@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Read(//c/Users/Sentz/.claude/**)",
+      "Bash(command -v claude)",
+      "Bash(claude plugin *)",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(p.get\\('name','?'\\), '@', p.get\\('marketplace','?'\\)\\) for p in data.get\\('available',[]\\)]\")",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\('✓', p['name']\\) for p in data.get\\('installed',[]\\)]\")",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\('✓', k\\) for k in data.get\\('plugins',{}\\).keys\\(\\)]\")",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(k\\) for k in data.get\\('plugins',{}\\).keys\\(\\)]\")",
+      "Bash(python *)",
+      "Bash(/c/Users/Sentz/AppData/Roaming/npm/claude plugin *)",
+      "Bash(/c/Users/Sentz/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/bin/claude.exe plugin *)",
+      "Bash(where claude *)",
+      "Bash(export PATH=\"$PATH:/c/Users/Sentz/AppData/Roaming/npm\")",
+      "PowerShell(& \"C:\\\\Users\\\\Sentz\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\@anthropic-ai\\\\claude-code\\\\bin\\\\claude.exe\" plugin install \"design-audit@bencium-marketplace\"; echo \"---\"; & \"C:\\\\Users\\\\Sentz\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\@anthropic-ai\\\\claude-code\\\\bin\\\\claude.exe\" plugin install \"human-architect-mindset@bencium-marketplace\"; echo \"---\"; & \"C:\\\\Users\\\\Sentz\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\@anthropic-ai\\\\claude-code\\\\bin\\\\claude.exe\" plugin install \"negentropy-lens@bencium-marketplace\"; echo \"---\")",
+      "Bash(claude doctor *)",
+      "Bash(git clone *)"
+    ]
+  }
+}

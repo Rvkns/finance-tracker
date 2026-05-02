@@ -61,6 +61,14 @@ export default async function DashboardPage() {
         .lte('date', endOfMonth)
         .order('date', { ascending: false });
 
+    // Fetch the 20 most recent transactions overall (for the history section)
+    const { data: recentAllTransactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('household_id', profile.household_id)
+        .order('date', { ascending: false })
+        .limit(20);
+
     // Fetch ALL historical transactions for cumulative balance
     const { data: allTransactions } = await supabase
         .from('transactions')
@@ -83,7 +91,7 @@ export default async function DashboardPage() {
         !(transactions ?? []).some(t => t.description === recur.name)
     );
 
-    const recentTransactions = (transactions ?? []).slice(0, 20);
+    const recentTransactions = (recentAllTransactions ?? []);
 
     const monthlyTotal = (transactions ?? []).reduce((sum: number, t: Transaction) => sum + Number(t.amount), 0);
     const myTotal = (transactions ?? [])

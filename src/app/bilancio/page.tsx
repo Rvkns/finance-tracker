@@ -4,6 +4,7 @@ import type { Transaction, StructuralExpense } from '@/lib/types';
 import StruttturaliClient from './StruttturaliClient';
 import BilancioTabs from './BilancioTabs';
 import styles from './page.module.css';
+import { getCategoryById } from '@/lib/categories';
 
 function formatCurrency(amount: number) {
     return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
@@ -63,7 +64,7 @@ export default async function BilancioPage({ searchParams }: { searchParams: Pro
     // ── Fetch all transactions (storico) ──────────────────────────────
     const { data: allTransactions } = await supabase
         .from('transactions')
-        .select('user_id, amount, date')
+        .select('id, user_id, amount, date, description, category_id')
         .eq('household_id', profile.household_id)
         .order('date', { ascending: true });
 
@@ -75,26 +76,27 @@ export default async function BilancioPage({ searchParams }: { searchParams: Pro
         : 0.5;
 
     // Group transactions by month
-    const monthMap: Record<string, { myPaid: number; partnerPaid: number }> = {};
+    const monthMap: Record<string, { myPaid: number; partnerPaid: number; transactions: typeof allTransactions }> = {};
     for (const t of allTransactions ?? []) {
         const key = monthKey(t.date);
-        if (!monthMap[key]) monthMap[key] = { myPaid: 0, partnerPaid: 0 };
+        if (!monthMap[key]) monthMap[key] = { myPaid: 0, partnerPaid: 0, transactions: [] };
         if (t.user_id === user.id) {
             monthMap[key].myPaid += Number(t.amount);
         } else {
             monthMap[key].partnerPaid += Number(t.amount);
         }
+        monthMap[key].transactions?.push(t);
     }
 
     const sortedKeys = Object.keys(monthMap).sort();
     let runningBalance = 0;
     const months = sortedKeys.map(key => {
-        const { myPaid, partnerPaid } = monthMap[key];
+        const { myPaid, partnerPaid, transactions } = monthMap[key];
         const total = myPaid + partnerPaid;
         const myFairShare = total * myWeight;
         const monthDelta = myPaid - myFairShare;
         runningBalance += monthDelta;
-        return { key, myPaid, partnerPaid, total, monthDelta, runningBalance };
+        return { key, myPaid, partnerPaid, total, monthDelta, runningBalance, transactions };
     });
 
     const allMyTotal = (allTransactions ?? [])
@@ -193,44 +195,69 @@ export default async function BilancioPage({ searchParams }: { searchParams: Pro
                                         const runNegative = m.runningBalance < -0.01;
                                         const runColor = runPositive ? 'var(--success)' : runNegative ? 'var(--danger)' : 'var(--text-secondary)';
                                         return (
-                                            <div key={m.key} className={`${styles.monthCard} ${isNow ? styles.monthCardCurrent : ''}`}>
-                                                <div className={styles.monthCardHeader}>
-                                                    <div>
-                                                        <p className={styles.monthName} style={{ textTransform: 'capitalize' }}>
-                                                            {monthLabel(m.key)}
-                                                            {isNow && <span className={styles.nowBadge}>In corso</span>}
-                                                        </p>
-                                                        <p className={styles.monthTotal}>Totale: {formatCurrency(m.total)}</p>
+                                            <details key={m.key} className={`${styles.monthCard} ${isNow ? styles.monthCardCurrent : ''}`}>
+                                                <summary className={styles.monthSummary}>
+                                                    <div className={styles.monthCardHeader}>
+                                                        <div>
+                                                            <p className={styles.monthName} style={{ textTransform: 'capitalize' }}>
+                                                                {monthLabel(m.key)}
+                                                                {isNow && <span className={styles.nowBadge}>In corso</span>}
+                                                            </p>
+                                                            <p className={styles.monthTotal}>Totale: {formatCurrency(m.total)}</p>
+                                                        </div>
+                                                        <div className={styles.runningBadge} style={{ background: `${runColor}18`, borderColor: `${runColor}44`, color: runColor }}>
+                                                            {runPositive ? `▲ ${formatCurrency(m.runningBalance)}` : runNegative ? `▼ ${formatCurrency(Math.abs(m.runningBalance))}` : '⚖ Pari'}
+                                                        </div>
                                                     </div>
-                                                    <div className={styles.runningBadge} style={{ background: `${runColor}18`, borderColor: `${runColor}44`, color: runColor }}>
-                                                        {runPositive ? `▲ ${formatCurrency(m.runningBalance)}` : runNegative ? `▼ ${formatCurrency(Math.abs(m.runningBalance))}` : '⚖ Pari'}
-                                                    </div>
-                                                </div>
 
-                                                <div className={styles.paidRow}>
-                                                    <div className={styles.paidItem}>
-                                                        <span className={styles.paidDot} style={{ background: 'var(--accent)' }} />
-                                                        <span className={styles.paidName}>{userName}</span>
-                                                        <span className={styles.paidAmount} style={{ color: 'var(--accent-light)' }}>{formatCurrency(m.myPaid)}</span>
+                                                    <div className={styles.paidRow}>
+                                                        <div className={styles.paidItem}>
+                                                            <span className={styles.paidDot} style={{ background: 'var(--accent)' }} />
+                                                            <span className={styles.paidName}>{userName}</span>
+                                                            <span className={styles.paidAmount} style={{ color: 'var(--accent-light)' }}>{formatCurrency(m.myPaid)}</span>
+                                                        </div>
+                                                        <div className={styles.paidItem}>
+                                                            <span className={styles.paidDot} style={{ background: 'var(--success)' }} />
+                                                            <span className={styles.paidName}>{partnerName}</span>
+                                                            <span className={styles.paidAmount} style={{ color: 'var(--success)' }}>{formatCurrency(m.partnerPaid)}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className={styles.paidItem}>
-                                                        <span className={styles.paidDot} style={{ background: 'var(--success)' }} />
-                                                        <span className={styles.paidName}>{partnerName}</span>
-                                                        <span className={styles.paidAmount} style={{ color: 'var(--success)' }}>{formatCurrency(m.partnerPaid)}</span>
-                                                    </div>
-                                                </div>
 
-                                                <div className={styles.deltaRow} style={{ color: deltaColor }}>
-                                                    <span className={styles.deltaLabel}>Δ questo mese:</span>
-                                                    <span className={styles.deltaValue}>
-                                                        {deltaPositive
-                                                            ? `${partnerName} deve ${formatCurrency(m.monthDelta)}`
-                                                            : deltaNegative
-                                                                ? `${userName} deve ${formatCurrency(Math.abs(m.monthDelta))}`
-                                                                : 'Pari'}
-                                                    </span>
+                                                    <div className={styles.deltaRow} style={{ color: deltaColor }}>
+                                                        <span className={styles.deltaLabel}>Δ questo mese:</span>
+                                                        <span className={styles.deltaValue}>
+                                                            {deltaPositive
+                                                                ? `${partnerName} deve ${formatCurrency(m.monthDelta)}`
+                                                                : deltaNegative
+                                                                    ? `${userName} deve ${formatCurrency(Math.abs(m.monthDelta))}`
+                                                                    : 'Pari'}
+                                                        </span>
+                                                    </div>
+                                                </summary>
+
+                                                <div className={styles.monthDetails}>
+                                                    {m.transactions?.slice().reverse().map(t => {
+                                                        const cat = getCategoryById(t.category_id);
+                                                        const isMe = t.user_id === user.id;
+                                                        const txColor = isMe ? 'var(--accent)' : 'var(--success)';
+                                                        const txName = isMe ? userName : partnerName;
+                                                        const tDate = new Date(t.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+
+                                                        return (
+                                                            <div key={t.id} className={styles.txRow}>
+                                                                <div className={styles.txIcon} style={{ background: cat.color + '22', color: cat.color }}>
+                                                                    {cat.icon}
+                                                                </div>
+                                                                <div className={styles.txInfo}>
+                                                                    <span className={styles.txName}>{cat.name} {t.description ? `- ${t.description}` : ''}</span>
+                                                                    <span className={styles.txDateUser}>{tDate} • Pagato da <span style={{ color: txColor, fontWeight: 600 }}>{txName}</span></span>
+                                                                </div>
+                                                                <span className={styles.txAmount}>-{formatCurrency(Number(t.amount))}</span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
-                                            </div>
+                                            </details>
                                         );
                                     })}
                                 </div>
