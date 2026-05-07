@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import BottomNav from '@/components/BottomNav';
+import SideMenu from '@/components/SideMenu';
+import FAB from '@/components/FAB';
 import styles from '../dashboard/layout.module.css';
 
 export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
@@ -9,8 +10,9 @@ export default async function ProfileLayout({ children }: { children: React.Reac
     if (!user) redirect('/login');
     return (
         <div className={styles.shell}>
+            <SideMenu />
             <main className={styles.content}>{children}</main>
-            <BottomNav />
+            <FAB />
         </div>
     );
 }

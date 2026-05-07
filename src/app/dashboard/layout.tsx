@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import BottomNav from '@/components/BottomNav';
+import SideMenu from '@/components/SideMenu';
+import FAB from '@/components/FAB';
 import styles from './layout.module.css';
 
 export default async function DashboardLayout({
@@ -17,10 +18,11 @@ export default async function DashboardLayout({
 
     return (
         <div className={styles.shell}>
+            <SideMenu />
             <main className={styles.content}>
                 {children}
             </main>
-            <BottomNav />
+            <FAB />
         </div>
     );
 }

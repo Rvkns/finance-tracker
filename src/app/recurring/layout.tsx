@@ -4,11 +4,10 @@ import SideMenu from '@/components/SideMenu';
 import FAB from '@/components/FAB';
 import styles from '../dashboard/layout.module.css';
 
-export default async function BilancioLayout({ children }: { children: React.ReactNode }) {
+export default async function RecurringLayout({ children }: { children: React.ReactNode }) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
-
     return (
         <div className={styles.shell}>
             <SideMenu />

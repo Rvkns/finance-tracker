@@ -58,15 +58,6 @@ export default async function AbbonamentiPage() {
 
     return (
         <div className={styles.page}>
-            <div className={styles.topNav}>
-                <Link href="/dashboard" className={styles.navLink}>
-                    <span>🏠</span> Home
-                </Link>
-                <Link href="/profile" className={styles.navLink}>
-                    <span>👤</span> Profilo
-                </Link>
-            </div>
-
             <header className={styles.header}>
                 <h1 className={styles.title}>Abbonamenti Mensili</h1>
                 <p className={styles.subtitle}>Gestisci i tuoi servizi ricorrenti e monitora l&apos;impatto sul tuo stipendio.</p>
