@@ -41,10 +41,10 @@ export default function SideMenu() {
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Menu navigazione"
             >
-                <div className={styles.hamburger}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div className={styles.arrowIcon}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
                 </div>
             </button>
 

@@ -1,57 +1,44 @@
-/* Toggle Button */
+/* Toggle Button (Tab on left edge) */
 .menuToggle {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
     z-index: 1000;
     background: var(--bg-card);
     border: 1px solid var(--border-light);
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+    width: 32px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .menuToggle:hover {
-    transform: scale(1.05);
+    width: 38px;
+    background: var(--bg-card-hover);
 }
 
-.hamburger {
-    width: 24px;
-    height: 18px;
-    position: relative;
+.menuToggle.open {
+    left: min(80%, 320px);
+}
+
+.arrowIcon {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hamburger span {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background-color: var(--text-primary);
-    border-radius: 2px;
-    transition: all 0.3s ease-in-out;
-}
-
-/* Hamburger to X animation */
-.open .hamburger span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-    background-color: var(--accent);
-}
-
-.open .hamburger span:nth-child(2) {
-    opacity: 0;
-}
-
-.open .hamburger span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-    background-color: var(--accent);
+/* Arrow points right when closed, left when open */
+.open .arrowIcon {
+    transform: rotate(180deg);
 }
 
 /* Overlay */
@@ -78,23 +65,23 @@
 .drawer {
     position: fixed;
     top: 0;
-    right: -100%;
+    left: -100%;
     width: 80%;
     max-width: 320px;
     height: 100dvh;
     background: var(--bg-page);
-    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     z-index: 999;
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    padding: 80px 24px 24px 24px; /* Top padding to clear hamburger */
+    padding: 32px 24px 24px 24px;
     overflow-y: auto;
 }
 
 .drawerOpen {
-    right: 0;
+    left: 0;
 }
 
 .drawerHeader h2 {
