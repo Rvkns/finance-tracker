@@ -59,3 +59,14 @@ export interface StructuralExpense {
     created_at?: string;
     updated_at?: string;
 }
+
+export interface Subscription {
+    id: string;
+    household_id: string;
+    user_id: string;
+    name: string;
+    category_id: string;
+    amount: number;
+    created_at?: string;
+    updated_at?: string;
+}

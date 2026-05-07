@@ -178,6 +178,14 @@ export default function ProfilePage() {
                 🔄 Gestisci Spese Fisse
             </button>
 
+            <button
+                onClick={() => router.push('/abbonamenti')}
+                className={styles.btn}
+                style={{ marginBottom: '32px', background: 'var(--bg-card)', color: 'var(--accent)', border: '1px solid var(--accent)' }}
+            >
+                📱 Gestisci Abbonamenti
+            </button>
+
             <button onClick={handleLogout} className={styles.logoutBtn}>
                 🚪 Disconnetti
             </button>
