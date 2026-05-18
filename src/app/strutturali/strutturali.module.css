@@ -357,3 +357,96 @@
     padding-bottom: 8px;
     opacity: 0.7;
 }
+
+/* ── Paga Ora styles ── */
+.payBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.payBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.payBtnActive {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.payBtnActive:hover {
+    background: rgba(16, 185, 129, 0.25);
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.expenseCardPaid {
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.01) 0%, rgba(16, 185, 129, 0.02) 100%) !important;
+}
+
+.expenseCardPaid .expenseName {
+    color: var(--text-secondary);
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.expenseCardPaid .expenseAmount {
+    opacity: 0.7;
+}
+
+/* Success Banner */
+.successBanner {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.18) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.successText {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--success);
+    margin: 0;
+}
+
+.resetBtn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.resetBtn:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.96); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}

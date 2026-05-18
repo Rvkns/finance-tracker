@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import type { StructuralExpense } from '@/lib/types';
 import styles from './strutturali.module.css';
 
@@ -30,6 +30,41 @@ export default function StruttturaliClient({
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editAmount, setEditAmount] = useState('');
     const [isPending, startTransition] = useTransition();
+
+    // ── Local Paid Status ───────────────────────────────────────────────────
+    const [paidExpenseIds, setPaidExpenseIds] = useState<string[]>([]);
+    const currentMonthKey = new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    const storageKey = `structural_paid_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                try {
+                    setPaidExpenseIds(JSON.parse(saved));
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+    }, [storageKey]);
+
+    const togglePaid = (id: string) => {
+        setPaidExpenseIds(prev => {
+            const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+            localStorage.setItem(storageKey, JSON.stringify(next));
+            return next;
+        });
+    };
+
+    const handleResetMonth = () => {
+        if (confirm("Vuoi ripristinare tutte le spese strutturali come 'Da pagare' per questo mese?")) {
+            setPaidExpenseIds([]);
+            localStorage.removeItem(storageKey);
+        }
+    };
+
+    const allPaid = expenses.length > 0 && expenses.every(e => paidExpenseIds.includes(e.id));
 
     // Form state
     const [formName, setFormName] = useState('');
@@ -234,6 +269,16 @@ export default function StruttturaliClient({
                 </div>
             )}
 
+            {/* ── Banner tutto pagato ── */}
+            {allPaid && (
+                <div className={styles.successBanner}>
+                    <p className={styles.successText}>
+                        🎉 Siete perfettamente in pari con le spese strutturali di <span style={{ textTransform: 'capitalize' }}>{currentMonthKey}</span>!
+                    </p>
+                    <button className={styles.resetBtn} onClick={handleResetMonth}>Ripristina</button>
+                </div>
+            )}
+
             {/* ── Expense cards ── */}
             <div className={styles.list}>
                 {expenses.length === 0 ? (
@@ -245,8 +290,9 @@ export default function StruttturaliClient({
                     expenses.map(expense => {
                         const meta = paidByLabel(expense.paid_by);
                         const isEditing = editingId === expense.id;
+                        const isPaid = paidExpenseIds.includes(expense.id);
                         return (
-                            <div key={expense.id} className={styles.expenseCard}>
+                            <div key={expense.id} className={`${styles.expenseCard} ${isPaid ? styles.expenseCardPaid : ''}`}>
                                 <div className={styles.expenseLeft}>
                                     <p className={styles.expenseName}>{expense.name}</p>
                                     <span className={styles.expenseBadge} style={{ color: meta.color }}>
@@ -254,6 +300,16 @@ export default function StruttturaliClient({
                                     </span>
                                 </div>
                                 <div className={styles.expenseRight}>
+                                    {!isEditing && (
+                                        <button
+                                            className={`${styles.payBtn} ${isPaid ? styles.payBtnActive : ''}`}
+                                            onClick={() => togglePaid(expense.id)}
+                                            title={isPaid ? "Segna come da pagare" : "Segna come pagato"}
+                                        >
+                                            {isPaid ? '✅ Pagato' : '💳 Paga'}
+                                        </button>
+                                    )}
+
                                     {isEditing ? (
                                         <div className={styles.editRow}>
                                             <input
