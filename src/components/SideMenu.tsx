@@ -12,6 +12,7 @@ const menuItems = [
     { href: '/recurring', label: 'Spese Fisse', icon: '🔄' },
     { href: '/strutturali', label: 'Spese Strutturali', icon: '🏗️' },
     { href: '/abbonamenti', label: 'Abbonamenti', icon: '📱' },
+    { href: '/wiki', label: 'Wiki & Guida', icon: '📖' },
     { href: '/profile', label: 'Profilo', icon: '👤' },
 ];
 
