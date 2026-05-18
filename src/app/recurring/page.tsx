@@ -32,12 +32,12 @@ export default async function RecurringPage() {
     return (
         <div className={styles.page}>
             <header className={styles.header}>
-                <h1 className={styles.title}>Spese Fisse 🔄</h1>
-                <p className={styles.subtitle}>Gestisci i tuoi abbonamenti e costi ricorrenti</p>
+                <h1 className={styles.title}>Bollette ⚡</h1>
+                <p className={styles.subtitle}>Gestisci e scadenzi le bollette periodiche della casa (acqua, luce, gas...)</p>
             </header>
 
             <div className={styles.totalCard}>
-                <p className={styles.totalLabel}>Costo Fisso Mensile Totale</p>
+                <p className={styles.totalLabel}>Costo Mensile Stimato Bollette</p>
                 <p className={styles.totalAmount}>{formatCurrency(totalFixedCost)}</p>
             </div>
 

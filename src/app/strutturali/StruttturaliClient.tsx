@@ -63,7 +63,7 @@ export default function StruttturaliClient({
     };
 
     const handleResetMonth = async () => {
-        if (confirm("Vuoi ripristinare tutte le spese strutturali come 'Da pagare' per questo mese?")) {
+        if (confirm("Vuoi ripristinare tutte le spese fisse come 'Da pagare' per questo mese?")) {
             const originalPaidIds = [...paidExpenseIds];
             setPaidExpenseIds([]);
 
@@ -196,7 +196,7 @@ export default function StruttturaliClient({
             <div className={styles.calcCard}>
                 <p className={styles.calcTitle}>📊 Piano di Pagamento Mensile</p>
                 <div className={styles.calcTotal}>
-                    <span>Totale strutturale</span>
+                    <span>Totale spese fisse</span>
                     <strong>{formatCurrency(totalStructural)}</strong>
                 </div>
                 <div className={styles.calcTotal}>
@@ -238,7 +238,7 @@ export default function StruttturaliClient({
 
             {/* ── Lista spese ── */}
             <div className={styles.listHeader}>
-                <h2 className={styles.listTitle}>Voci Strutturali</h2>
+                <h2 className={styles.listTitle}>Voci Fisse</h2>
                 <button className={styles.addBtn} onClick={() => setShowForm(v => !v)}>
                     {showForm ? '✕ Annulla' : '+ Aggiungi'}
                 </button>
@@ -290,7 +290,7 @@ export default function StruttturaliClient({
             {allPaid && (
                 <div className={styles.successBanner}>
                     <p className={styles.successText}>
-                        🎉 Siete perfettamente in pari con le spese strutturali di <span style={{ textTransform: 'capitalize' }}>{currentMonthLabel}</span>!
+                        🎉 Siete perfettamente in pari con le spese fisse di <span style={{ textTransform: 'capitalize' }}>{currentMonthLabel}</span>!
                     </p>
                     <button className={styles.resetBtn} onClick={handleResetMonth}>Ripristina</button>
                 </div>
@@ -300,8 +300,8 @@ export default function StruttturaliClient({
             <div className={styles.list}>
                 {expenses.length === 0 ? (
                     <div className={styles.empty}>
-                        <span>🏗️</span>
-                        <p>Nessuna spesa strutturale ancora.<br />Aggiungi mutuo, rate o simili.</p>
+                        <span>🏦</span>
+                        <p>Nessuna spesa fissa ancora.<br />Aggiungi mutuo, rate o simili.</p>
                     </div>
                 ) : (
                     expenses.map(expense => {
@@ -367,7 +367,7 @@ export default function StruttturaliClient({
             </div>
 
             <p className={styles.disclaimer}>
-                ℹ️ Le spese strutturali non influenzano il saldo cumulativo.
+                ℹ️ Le spese fisse a lungo termine non influenzano il saldo cumulativo.
             </p>
         </div>
     );

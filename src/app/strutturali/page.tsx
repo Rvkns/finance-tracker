@@ -45,8 +45,8 @@ export default async function StrutturaliPage() {
     return (
         <div className={styles.page}>
             <header className={styles.header}>
-                <h1 className={styles.title}>Spese Strutturali 🏗️</h1>
-                <p className={styles.subtitle}>Gestisci mutuo, rate, prestiti e spese fisse a lungo termine</p>
+                <h1 className={styles.title}>Spese Fisse 🏦</h1>
+                <p className={styles.subtitle}>Gestisci mutuo, rate, prestiti e finanziamenti a lungo termine</p>
             </header>
 
             <StruttturaliClient
