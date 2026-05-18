@@ -10,6 +10,7 @@ const menuItems = [
     { href: '/statistics', label: 'Statistiche', icon: '📊' },
     { href: '/bilancio', label: 'Bilancio', icon: '⚖️' },
     { href: '/recurring', label: 'Spese Fisse', icon: '🔄' },
+    { href: '/strutturali', label: 'Spese Strutturali', icon: '🏗️' },
     { href: '/abbonamenti', label: 'Abbonamenti', icon: '📱' },
     { href: '/profile', label: 'Profilo', icon: '👤' },
 ];
