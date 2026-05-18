@@ -6,6 +6,7 @@ import styles from './strutturali.module.css';
 
 interface Props {
     initialExpenses: StructuralExpense[];
+    initialPaidIds: string[];
     userId: string;
     userName: string;
     partnerName: string;
@@ -19,6 +20,7 @@ function formatCurrency(amount: number) {
 
 export default function StruttturaliClient({
     initialExpenses,
+    initialPaidIds,
     userId,
     userName,
     partnerName,
@@ -31,36 +33,51 @@ export default function StruttturaliClient({
     const [editAmount, setEditAmount] = useState('');
     const [isPending, startTransition] = useTransition();
 
-    // ── Local Paid Status ───────────────────────────────────────────────────
-    const [paidExpenseIds, setPaidExpenseIds] = useState<string[]>([]);
-    const currentMonthKey = new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-    const storageKey = `structural_paid_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+    // ── Database / API Paid Status ───────────────────────────────────────────
+    const [paidExpenseIds, setPaidExpenseIds] = useState<string[]>(initialPaidIds);
+    const currentMonthLabel = new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                try {
-                    setPaidExpenseIds(JSON.parse(saved));
-                } catch (e) {
-                    console.error(e);
-                }
+    const togglePaid = async (id: string) => {
+        const isPaid = paidExpenseIds.includes(id);
+        
+        // Aggiornamento ottimistico dell'UI
+        setPaidExpenseIds(prev => isPaid ? prev.filter(x => x !== id) : [...prev, id]);
+
+        try {
+            if (isPaid) {
+                // DELETE payment
+                await apiCall(`/api/structural/payments?expense_id=${id}&month_key=${currentMonthKey}`, 'DELETE');
+            } else {
+                // POST payment
+                await apiCall('/api/structural/payments', 'POST', {
+                    expense_id: id,
+                    month_key: currentMonthKey
+                });
             }
+        } catch (e) {
+            console.error(e);
+            // Ripristino dello stato precedente in caso di errore
+            setPaidExpenseIds(prev => isPaid ? [...prev, id] : prev.filter(x => x !== id));
         }
-    }, [storageKey]);
-
-    const togglePaid = (id: string) => {
-        setPaidExpenseIds(prev => {
-            const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-            localStorage.setItem(storageKey, JSON.stringify(next));
-            return next;
-        });
     };
 
-    const handleResetMonth = () => {
+    const handleResetMonth = async () => {
         if (confirm("Vuoi ripristinare tutte le spese strutturali come 'Da pagare' per questo mese?")) {
+            const originalPaidIds = [...paidExpenseIds];
             setPaidExpenseIds([]);
-            localStorage.removeItem(storageKey);
+
+            try {
+                // Cancella tutti i record di pagamento per questo mese
+                await Promise.all(
+                    originalPaidIds.map(id =>
+                        apiCall(`/api/structural/payments?expense_id=${id}&month_key=${currentMonthKey}`, 'DELETE')
+                    )
+                );
+            } catch (e) {
+                console.error(e);
+                setPaidExpenseIds(originalPaidIds);
+            }
         }
     };
 
@@ -273,7 +290,7 @@ export default function StruttturaliClient({
             {allPaid && (
                 <div className={styles.successBanner}>
                     <p className={styles.successText}>
-                        🎉 Siete perfettamente in pari con le spese strutturali di <span style={{ textTransform: 'capitalize' }}>{currentMonthKey}</span>!
+                        🎉 Siete perfettamente in pari con le spese strutturali di <span style={{ textTransform: 'capitalize' }}>{currentMonthLabel}</span>!
                     </p>
                     <button className={styles.resetBtn} onClick={handleResetMonth}>Ripristina</button>
                 </div>

@@ -33,6 +33,15 @@ export default async function StrutturaliPage() {
         .eq('household_id', profile.household_id)
         .order('created_at', { ascending: true });
 
+    // ── Fetch current month's payment statuses ──────────────────────────
+    const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    const { data: paidRecords } = await supabase
+        .from('structural_expense_payments')
+        .select('expense_id')
+        .eq('month_key', currentMonthKey);
+
+    const initialPaidIds = paidRecords?.map(r => r.expense_id) ?? [];
+
     return (
         <div className={styles.page}>
             <header className={styles.header}>
@@ -42,6 +51,7 @@ export default async function StrutturaliPage() {
 
             <StruttturaliClient
                 initialExpenses={(structuralExpenses ?? []) as StructuralExpense[]}
+                initialPaidIds={initialPaidIds}
                 userId={user.id}
                 userName={userName}
                 partnerName={partnerName}
