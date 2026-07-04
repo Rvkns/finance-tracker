@@ -66,6 +66,18 @@ export default function DashboardClient({
         setPayingId(exp.id);
         const supabase = createClient();
 
+        // Calcola la data: usa il giorno di addebito configurato nel mese corrente, altrimenti oggi
+        let txDate: string;
+        if (exp.day_of_month) {
+            const now = new Date();
+            // Limita il giorno al massimo dei giorni del mese corrente (es. febbraio non ha il 31)
+            const maxDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const day = Math.min(exp.day_of_month, maxDay);
+            txDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        } else {
+            txDate = new Date().toISOString().split('T')[0]; // fallback: oggi
+        }
+
         // 1. Create the new transaction
         const newTx = {
             user_id: userId,
@@ -73,7 +85,7 @@ export default function DashboardClient({
             amount: exp.amount,
             category_id: exp.category_id,
             description: exp.name,
-            date: new Date().toISOString().split('T')[0] // today's date YYYY-MM-DD
+            date: txDate,
         };
 
         const { data, error } = await supabase
@@ -109,6 +121,9 @@ export default function DashboardClient({
                         {pendingFixed.map(exp => {
                             const cat = getCategoryById(exp.category_id);
                             const isPaying = payingId === exp.id;
+                            const dayLabel = exp.day_of_month
+                                ? `Addebito il ${exp.day_of_month}°`
+                                : 'Spesa Fissa';
                             return (
                                 <li key={exp.id} className={styles.transactionItem}>
                                     <div className={styles.itemContent} style={{ opacity: isPaying ? 0.5 : 1 }}>
@@ -118,7 +133,7 @@ export default function DashboardClient({
                                         <div className={styles.transactionInfo}>
                                             <p className={styles.transactionCat}>{exp.name}</p>
                                             <div className={styles.transactionMeta}>
-                                                <span className={styles.transactionDate}>Spesa Fissa</span>
+                                                <span className={styles.transactionDate}>{dayLabel}</span>
                                             </div>
                                         </div>
                                         <p className={styles.transactionAmount} style={{ alignSelf: 'center', margin: '0 8px' }}>
@@ -133,7 +148,7 @@ export default function DashboardClient({
                                                 fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
                                             }}
                                         >
-                                            {isPaying ? '...' : 'Paga ora'}
+                                            {isPaying ? '...' : 'Registra'}
                                         </button>
                                     </div>
                                 </li>

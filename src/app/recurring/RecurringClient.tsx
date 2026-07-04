@@ -142,12 +142,14 @@ export default function RecurringClient({ initialExpenses, householdId }: Props)
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [categoryId, setCategoryId] = useState(CATEGORIES[3].id); // default 'house'
+    const [dayOfMonth, setDayOfMonth] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleHideModal = () => {
         setIsAdding(false);
         setName('');
         setAmount('');
+        setDayOfMonth('');
     };
 
     const handleSave = async (e: React.FormEvent) => {
@@ -163,6 +165,7 @@ export default function RecurringClient({ initialExpenses, householdId }: Props)
             name,
             amount: numAmount,
             category_id: categoryId,
+            day_of_month: dayOfMonth ? parseInt(dayOfMonth, 10) : null,
         };
 
         const { data, error } = await supabase
@@ -271,7 +274,14 @@ export default function RecurringClient({ initialExpenses, householdId }: Props)
                                 </div>
                                 <div className={styles.info}>
                                     <p className={styles.name}>{exp.name}</p>
-                                    <p className={styles.cat}>{cat.name}</p>
+                                    <p className={styles.cat}>
+                                        {cat.name}
+                                        {exp.day_of_month && (
+                                            <span style={{ marginLeft: '6px', opacity: 0.75, fontSize: '11px' }}>
+                                                · 📅 Addebito il {exp.day_of_month}°
+                                            </span>
+                                        )}
+                                    </p>
                                 </div>
                                 <p className={styles.amount}>{formatCurrency(exp.amount)}</p>
                                 <button className={styles.deleteBtn} onClick={() => handleDelete(exp.id)}>
@@ -328,6 +338,19 @@ export default function RecurringClient({ initialExpenses, householdId }: Props)
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div className={styles.field}>
+                                <label className={styles.label}>Giorno di addebito (es. 5 = il 5 del mese)</label>
+                                <input
+                                    className={styles.input}
+                                    type="number"
+                                    min="1"
+                                    max="31"
+                                    value={dayOfMonth}
+                                    onChange={e => setDayOfMonth(e.target.value)}
+                                    placeholder="Lascia vuoto se variabile"
+                                />
                             </div>
 
                             <div className={styles.modalActions}>

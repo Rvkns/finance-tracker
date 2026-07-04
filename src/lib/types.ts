@@ -46,6 +46,7 @@ export interface RecurringExpense {
     category_id: string;
     name: string;
     amount: number;
+    day_of_month?: number | null; // giorno del mese in cui avviene l'addebito automatico (1-31)
     created_at?: string;
     updated_at?: string;
 }

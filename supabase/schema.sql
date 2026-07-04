@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS public.recurring_expenses (
   category_id TEXT NOT NULL,
   name TEXT NOT NULL,
   amount NUMERIC(12, 2) NOT NULL,
+  day_of_month SMALLINT CHECK (day_of_month BETWEEN 1 AND 31), -- giorno del mese dell'addebito automatico
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
