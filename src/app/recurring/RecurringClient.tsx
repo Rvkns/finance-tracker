@@ -276,9 +276,9 @@ export default function RecurringClient({ initialExpenses, householdId }: Props)
                                     <p className={styles.name}>{exp.name}</p>
                                     <p className={styles.cat}>
                                         {cat.name}
-                                        {exp.day_of_month && (
+                                        {exp.created_at && (
                                             <span style={{ marginLeft: '6px', opacity: 0.75, fontSize: '11px' }}>
-                                                · 📅 Addebito il {exp.day_of_month}°
+                                                · 📅 {new Date(exp.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </span>
                                         )}
                                     </p>

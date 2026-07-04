@@ -121,8 +121,8 @@ export default function DashboardClient({
                         {pendingFixed.map(exp => {
                             const cat = getCategoryById(exp.category_id);
                             const isPaying = payingId === exp.id;
-                            const dayLabel = exp.day_of_month
-                                ? `Addebito il ${exp.day_of_month}°`
+                            const dayLabel = exp.created_at
+                                ? new Date(exp.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
                                 : 'Spesa Fissa';
                             return (
                                 <li key={exp.id} className={styles.transactionItem}>
