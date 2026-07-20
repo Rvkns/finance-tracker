@@ -205,30 +205,23 @@ export default function DashboardClient({
                         {/* Filtro per Categoria */}
                         <div className={styles.filterGroup}>
                             <span className={styles.filterLabel}>🏷️ Categoria</span>
-                            <div className={styles.categoryFilterScroll}>
-                                <button
-                                    onClick={() => setSelectedCategory('all')}
-                                    className={`${styles.categoryPill} ${selectedCategory === 'all' ? styles.categoryPillActive : ''}`}
-                                    style={selectedCategory === 'all' ? { borderColor: 'var(--accent)', background: 'var(--accent-glow)', color: 'var(--text-primary)' } : {}}
-                                >
-                                    <span className={styles.pillIcon}>🏷️</span>
-                                    <span className={styles.pillName}>Tutte</span>
-                                </button>
-                                {CATEGORIES.map(cat => {
-                                    const isActive = selectedCategory === cat.id;
-                                    return (
-                                        <button
-                                            key={cat.id}
-                                            onClick={() => setSelectedCategory(cat.id)}
-                                            className={`${styles.categoryPill} ${isActive ? styles.categoryPillActive : ''}`}
-                                            style={isActive ? { borderColor: cat.color, background: cat.color + '22', color: 'var(--text-primary)' } : {}}
-                                        >
-                                            <span className={styles.pillIcon}>{cat.icon}</span>
-                                            <span className={styles.pillName}>{cat.name}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                            <select
+                                value={selectedCategory}
+                                onChange={e => setSelectedCategory(e.target.value)}
+                                className={styles.categorySelect}
+                                style={
+                                    selectedCategory !== 'all'
+                                        ? { borderColor: CATEGORIES.find(c => c.id === selectedCategory)?.color }
+                                        : {}
+                                }
+                            >
+                                <option value="all">🏷️ Tutte le categorie</option>
+                                {CATEGORIES.map(cat => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.icon} {cat.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 )}
