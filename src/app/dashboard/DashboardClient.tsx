@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { getCategoryById } from '@/lib/categories';
+import { getCategoryById, CATEGORIES } from '@/lib/categories';
 import type { Transaction, RecurringExpense } from '@/lib/types';
 import styles from './page.module.css';
 
@@ -41,6 +41,18 @@ export default function DashboardClient({
     const [pendingFixed, setPendingFixed] = useState(pendingRecurring);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [payingId, setPayingId] = useState<string | null>(null);
+
+    // Filtri
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedUser, setSelectedUser] = useState<string>('all');
+
+    const filteredTransactions = transactions.filter(t => {
+        const matchesCategory = selectedCategory === 'all' || t.category_id === selectedCategory;
+        const matchesUser = selectedUser === 'all' || 
+            (selectedUser === 'me' && t.user_id === userId) ||
+            (selectedUser === 'partner' && t.user_id !== userId);
+        return matchesCategory && matchesUser;
+    });
 
     const handleDelete = async (id: string) => {
         if (!confirm('Sei sicuro di voler eliminare questa spesa?')) return;
@@ -161,15 +173,91 @@ export default function DashboardClient({
             {/* RECENT TRANSACTIONS */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Ultime spese</h2>
+
+                {/* FILTRI DI SPESA */}
+                {transactions && transactions.length > 0 && (
+                    <div className={styles.filtersSection}>
+                        {/* Filtro per Utente */}
+                        <div className={styles.filterGroup}>
+                            <span className={styles.filterLabel}>👤 Speso da</span>
+                            <div className={styles.userFilter}>
+                                <button
+                                    onClick={() => setSelectedUser('all')}
+                                    className={`${styles.userFilterBtn} ${selectedUser === 'all' ? styles.userFilterBtnActive : ''}`}
+                                >
+                                    👥 Tutti
+                                </button>
+                                <button
+                                    onClick={() => setSelectedUser('me')}
+                                    className={`${styles.userFilterBtn} ${selectedUser === 'me' ? styles.userFilterBtnActive : ''}`}
+                                >
+                                    👤 Tu
+                                </button>
+                                <button
+                                    onClick={() => setSelectedUser('partner')}
+                                    className={`${styles.userFilterBtn} ${selectedUser === 'partner' ? styles.userFilterBtnActive : ''}`}
+                                >
+                                    👤 {partnerName}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Filtro per Categoria */}
+                        <div className={styles.filterGroup}>
+                            <span className={styles.filterLabel}>🏷️ Categoria</span>
+                            <div className={styles.categoryFilterScroll}>
+                                <button
+                                    onClick={() => setSelectedCategory('all')}
+                                    className={`${styles.categoryPill} ${selectedCategory === 'all' ? styles.categoryPillActive : ''}`}
+                                    style={selectedCategory === 'all' ? { borderColor: 'var(--accent)', background: 'var(--accent-glow)', color: 'var(--text-primary)' } : {}}
+                                >
+                                    <span className={styles.pillIcon}>🏷️</span>
+                                    <span className={styles.pillName}>Tutte</span>
+                                </button>
+                                {CATEGORIES.map(cat => {
+                                    const isActive = selectedCategory === cat.id;
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => setSelectedCategory(cat.id)}
+                                            className={`${styles.categoryPill} ${isActive ? styles.categoryPillActive : ''}`}
+                                            style={isActive ? { borderColor: cat.color, background: cat.color + '22', color: 'var(--text-primary)' } : {}}
+                                        >
+                                            <span className={styles.pillIcon}>{cat.icon}</span>
+                                            <span className={styles.pillName}>{cat.name}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {!transactions || transactions.length === 0 ? (
                     <div className={styles.empty}>
                         <span>💸</span>
                         <p>Nessuna spesa registrata.<br />Premi <strong>+</strong> per aggiungerne una!</p>
                     </div>
+                ) : filteredTransactions.length === 0 ? (
+                    <div className={styles.emptyFiltered}>
+                        <span className={styles.emptyFilteredIcon}>🔍</span>
+                        <p className={styles.emptyFilteredText}>
+                            Nessuna spesa corrisponde ai filtri selezionati.
+                        </p>
+                        <button
+                            onClick={() => {
+                                setSelectedCategory('all');
+                                setSelectedUser('all');
+                            }}
+                            className={styles.resetBtn}
+                        >
+                            Resetta filtri
+                        </button>
+                    </div>
                 ) : (
                     <>
                         <ul className={styles.transactionList}>
-                            {transactions.map((t: Transaction) => {
+                            {filteredTransactions.map((t: Transaction) => {
                                 const cat = getCategoryById(t.category_id);
                                 const isMe = t.user_id === userId;
                                 const isDeleting = deletingId === t.id;
