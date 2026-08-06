@@ -9,7 +9,6 @@ const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
     { href: '/statistics', label: 'Statistiche', icon: '📊' },
     { href: '/bilancio', label: 'Bilancio', icon: '⚖️' },
-    { href: '/recurring', label: 'Bollette', icon: '⚡' },
     { href: '/strutturali', label: 'Spese Fisse', icon: '🏦' },
     { href: '/abbonamenti', label: 'Abbonamenti', icon: '📱' },
     { href: '/wiki', label: 'Wiki & Guida', icon: '📖' },

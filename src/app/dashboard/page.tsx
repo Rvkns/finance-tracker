@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { CATEGORIES, getCategoryById } from '@/lib/categories';
-import type { Transaction, RecurringExpense } from '@/lib/types';
+import type { Transaction } from '@/lib/types';
 import DashboardClient from './DashboardClient';
 import styles from './page.module.css';
 
@@ -74,22 +74,6 @@ export default async function DashboardPage() {
         .from('transactions')
         .select('user_id, amount')
         .eq('household_id', profile.household_id);
-
-    // Fetch recurring expense templates
-    const { data: recurringExpenses } = await supabase
-        .from('recurring_expenses')
-        .select('*')
-        .eq('household_id', profile.household_id);
-
-    // Calculate pending recurring expenses
-    // A recurring expense is pending if NO transaction with the exact same name exists in THIS month
-    const pendingRecurring = (recurringExpenses ?? []).filter(recur =>
-        !(transactions ?? []).some(t => t.name === recur.name) // wait, transactions don't have name, they have description? Need to check. In our DB, transaction has 'description'. Let's match on description.
-    );
-    // Actually our previous definition of Transaction used description. Let's make sure it matches 'description'.
-    const finalPendingRecurring = (recurringExpenses ?? []).filter(recur =>
-        !(transactions ?? []).some(t => t.description === recur.name)
-    );
 
     const recentTransactions = (recentAllTransactions ?? []);
 
@@ -211,10 +195,9 @@ export default async function DashboardPage() {
 
 
 
-            {/* Recent Transactions & Pending Fixed Expenses */}
+            {/* Recent Transactions */}
             <DashboardClient
                 initialTransactions={recentTransactions}
-                pendingRecurring={finalPendingRecurring}
                 userId={user.id}
                 userName={userName}
                 partnerName={partnerName}

@@ -83,25 +83,22 @@ export default function WikiPage() {
         },
         {
             id: 'fisse',
-            title: '⚡ Bollette (Utenze)',
-            subtitle: 'Gestione e scadenze delle bollette di casa',
+            title: '⚡ Bollette & Utenze',
+            subtitle: 'Registrazione e categorizzazione delle bollette di casa',
             icon: '⚡',
             color: 'rgba(234, 179, 8, 0.1)',
             content: (
                 <>
                     <p className={styles.wikiText}>
-                        La sezione <strong>Bollette</strong> è pensata appositamente per fungere da scadenziario e centro pagamenti per le **Bollette di casa**.
+                        Le <strong>Bollette con addebito automatico</strong> (Luce, Gas, Acqua, Internet, TARI) vengono gestite direttamente inserendole come spese standard nel bilancio della casa.
                     </p>
-                    <h3 className={styles.wikiTitle}>📌 Il Flusso di Lavoro Consigliato</h3>
+                    <h3 className={styles.wikiTitle}>📌 Come registrarle</h3>
                     <ul className={styles.wikiList}>
                         <li className={styles.wikiListItem}>
-                            <strong>Configurazione iniziale:</strong> Inserite le vostre bollette ricorrenti come template (es. Luce, Gas, Internet) impostando l\'importo stimato o reale.
+                            <strong>Categorizzazione dedicata:</strong> Quando viene addebitata una bolletta, premere il tasto <strong>+</strong> e selezionare la relativa categoria (💧 Acqua, ⚡ Luce, 🔥 Gas, 🗑️ Mondezza/TARI, 🌐 Internet, ⚡ Bollette Generiche).
                         </li>
                         <li className={styles.wikiListItem}>
-                            <strong>Nuove Categorie Specifiche:</strong> Potete assegnare ad ogni voce una categoria dedicata (💧 Acqua, ⚡ Luce, 🔥 Gas, 🗑️ Mondezza/TARI, 🌐 Internet) per avere grafici precisi nelle statistiche.
-                        </li>
-                        <li className={styles.wikiListItem}>
-                            <strong>Il tasto "Paga ora":</strong> Quando la bolletta viene pagata da uno di voi, cliccate su <em>"Paga ora"</em>. L\'app inserirà in automatico la transazione nel bilancio ordinario, addebitandone la metà al partner.
+                            <strong>Analisi nelle Statistiche:</strong> Grazie alle categorie dedicate, potrai monitorare e confrontare in ogni momento l'andamento dei costi energetici e delle utenze nella sezione Statistiche.
                         </li>
                     </ul>
                 </>
@@ -183,7 +180,7 @@ export default function WikiPage() {
             <div className={styles.introCard}>
                 <h2 className={styles.introTitle}>✨ Benvenuti nella Guida Finanziaria di Coppia</h2>
                 <p className={styles.introText}>
-                    Questa applicazione è stata strutturata per separare logicamente le spese di tutti i giorni (variabili), le bollette periodiche (Bollette) e i grandi investimenti a lungo termine (Spese Fisse). Di seguito trovi una spiegazione dettagliata di ciascun modulo per utilizzarlo al massimo del suo potenziale!
+                    Questa applicazione è stata strutturata per separare logicamente le spese di tutti i giorni (comprese le utenze domestiche), gli abbonamenti e i grandi investimenti a lungo termine (Spese Fisse). Di seguito trovi una spiegazione dettagliata di ciascun modulo per utilizzarlo al massimo del suo potenziale!
                 </p>
             </div>
 

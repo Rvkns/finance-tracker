@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { getCategoryById, CATEGORIES } from '@/lib/categories';
-import type { Transaction, RecurringExpense } from '@/lib/types';
+import type { Transaction } from '@/lib/types';
 import styles from './page.module.css';
 
 function formatCurrency(amount: number) {
@@ -25,22 +25,18 @@ function formatDate(dateStr: string) {
 
 export default function DashboardClient({
     initialTransactions,
-    pendingRecurring,
     userId,
     userName,
     partnerName
 }: {
     initialTransactions: Transaction[];
-    pendingRecurring: RecurringExpense[];
     userId: string;
     userName: string;
     partnerName: string;
 }) {
     const router = useRouter();
     const [transactions, setTransactions] = useState(initialTransactions);
-    const [pendingFixed, setPendingFixed] = useState(pendingRecurring);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [payingId, setPayingId] = useState<string | null>(null);
 
     // Filtri
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -74,101 +70,8 @@ export default function DashboardClient({
         setDeletingId(null);
     };
 
-    const handlePayFixed = async (exp: RecurringExpense) => {
-        setPayingId(exp.id);
-        const supabase = createClient();
-
-        // Calcola la data: usa il giorno di addebito configurato nel mese corrente, altrimenti oggi
-        let txDate: string;
-        if (exp.day_of_month) {
-            const now = new Date();
-            // Limita il giorno al massimo dei giorni del mese corrente (es. febbraio non ha il 31)
-            const maxDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const day = Math.min(exp.day_of_month, maxDay);
-            txDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        } else {
-            txDate = new Date().toISOString().split('T')[0]; // fallback: oggi
-        }
-
-        // 1. Create the new transaction
-        const newTx = {
-            user_id: userId,
-            household_id: exp.household_id,
-            amount: exp.amount,
-            category_id: exp.category_id,
-            description: exp.name,
-            date: txDate,
-        };
-
-        const { data, error } = await supabase
-            .from('transactions')
-            .insert(newTx)
-            .select()
-            .single();
-
-        if (!error && data) {
-            // 2. Remove it from the pending list directly on the client
-            setPendingFixed(prev => prev.filter(p => p.id !== exp.id));
-            // 3. Add to the transaction list so the user sees it immediately
-            setTransactions(prev => [data, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-            // 4. Trigger router refresh to update server-side balances and total sums
-            router.refresh();
-        } else {
-            alert('Errore durante la registrazione del pagamento.');
-        }
-
-        setPayingId(null);
-    };
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-            {/* PENDING FIXED EXPENSES */}
-            {pendingFixed.length > 0 && (
-                <section className={styles.section}>
-                    <h2 className={styles.sectionTitle} style={{ color: 'var(--warning)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span>⚠️</span> Da Pagare
-                    </h2>
-                    <ul className={styles.transactionList}>
-                        {pendingFixed.map(exp => {
-                            const cat = getCategoryById(exp.category_id);
-                            const isPaying = payingId === exp.id;
-                            const dayLabel = exp.created_at
-                                ? new Date(exp.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
-                                : 'Spesa Fissa';
-                            return (
-                                <li key={exp.id} className={styles.transactionItem}>
-                                    <div className={styles.itemContent} style={{ opacity: isPaying ? 0.5 : 1 }}>
-                                        <div className={styles.catIcon} style={{ background: cat.color + '22', color: cat.color }}>
-                                            {cat.icon}
-                                        </div>
-                                        <div className={styles.transactionInfo}>
-                                            <p className={styles.transactionCat}>{exp.name}</p>
-                                            <div className={styles.transactionMeta}>
-                                                <span className={styles.transactionDate}>{dayLabel}</span>
-                                            </div>
-                                        </div>
-                                        <p className={styles.transactionAmount} style={{ alignSelf: 'center', margin: '0 8px' }}>
-                                            {formatCurrency(exp.amount)}
-                                        </p>
-                                        <button
-                                            onClick={() => handlePayFixed(exp)}
-                                            disabled={isPaying}
-                                            style={{
-                                                background: 'var(--success)', color: 'white', border: 'none',
-                                                borderRadius: '20px', padding: '6px 12px', fontSize: '12px',
-                                                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
-                                            }}
-                                        >
-                                            {isPaying ? '...' : 'Registra'}
-                                        </button>
-                                    </div>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </section>
-            )}
 
             {/* RECENT TRANSACTIONS */}
             <section className={styles.section}>
